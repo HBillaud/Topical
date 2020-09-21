@@ -1,0 +1,27 @@
+{
+  "name": "topical",
+  "version": "1.0.0",
+  "description": "Let's get Topical!",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vikramraju5/Topical.git"
+  },
+  "keywords": [
+    "Topical"
+  ],
+  "author": "Hadrien Billaud, Vikram Raju, Connor Crowe, Isaac Welliver",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vikramraju5/Topical/issues"
+  },
+  "homepage": "https://github.com/vikramraju5/Topical#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "mongoose": "^5.10.6"
+  }
+}
