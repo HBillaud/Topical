@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/vikramraju5/Topical#readme",
   "dependencies": {
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "mongoose": "^5.10.6"
