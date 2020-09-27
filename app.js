@@ -1,8 +1,18 @@
 const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
+const realm = require('realm');
 
 var app = express();
+
+const appId = "topical-gleqy";
+const appConfig = {
+	id: appId,
+	timeout: 10000,
+};
+const realmApp = new realm.App(appConfig);
+
+var users = require('./controllers/users_controller');
 
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
@@ -19,8 +29,14 @@ app.use(express.static(__dirname + '/public'));
 
 // set the home page route
 app.get('/', function(req, res) {
-    res.render('index.html');
+	if (realmApp.currentUser) {
+		res.render('index.html')
+	} else {
+		res.render('registration.html');
+	}
 });
+
+app.post('/', users.signup);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);
