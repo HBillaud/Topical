@@ -5,6 +5,7 @@ class User {
     followers;
     profilePic;
     bio;
+    userPosts;
     savedPosts;
 
     constructor(name, userID, email, password) {
@@ -84,6 +85,14 @@ class User {
 
     setBio(bio) {
         this.bio = bio;
+    }
+
+    getUserPosts() {
+        return this.userPosts;
+    }
+
+    setUserPosts(userPosts) {
+        this.userPosts = userPosts;
     }
 
     getSavedPosts() {
