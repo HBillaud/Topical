@@ -27,6 +27,7 @@ exports.login = async function(req, res) {
         return user;
     } catch (err) {
         console.error("Failed to log in!", err);
+        res.redirect('/login');
     }
 
     // console.log("Successfully logged in as: " + realmApp.currentUser.id);
