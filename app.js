@@ -1,17 +1,10 @@
 const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
-const realm = require('realm');
 
 var app = express();
 
-const appId = "topical-gleqy";
-const appConfig = {
-	id: appId,
-	timeout: 10000,
-};
-const realmApp = new realm.App(appConfig);
-
+// Including all controllers
 var users = require('./controllers/users_controller');
 
 // set the port of our application
@@ -24,19 +17,27 @@ app.set('views', __dirname + "/views");
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-// make express look in the public directory for assets (css/js/img)
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/node_modules'));
+app.use(express.static(__dirname + '/controllers'));
 
 // set the home page route
 app.get('/', function(req, res) {
-	if (realmApp.currentUser) {
-		res.render('index.html')
-	} else {
-		res.render('registration.html');
-	}
+		res.render('index');
 });
 
-app.post('/', users.signup);
+app.get('/signup', function(req, res) {
+	res.render('signup');
+});
+
+app.get('/login', function(req, res) {
+	res.render('login');
+});
+
+app.post('/signup', users.signup);
+app.post('/login', users.login);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);
