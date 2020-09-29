@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
 <body style="margin-top: 100px">
-    <div id="fb-root"></div>
+    <!-- <div id="fb-root"></div> -->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v8.0&appId=246172146824778" nonce="5Wp19Fc0"></script>
     <script>
 
@@ -17,7 +17,6 @@
             console.log('connected');
         } else {                                 // Not logged into your webpage or we are unable to tell.
             // document.getElementById('status').innerHTML = 'Please log into this webpage.';
-
         }
         }
     
@@ -26,6 +25,7 @@
         FB.getLoginStatus(function(response) {   // See the onlogin handler
             statusChangeCallback(response);
             console.log('checkLoginState');
+            response.redirect('/');
         });
         }
     
@@ -33,10 +33,10 @@
         window.fbAsyncInit = function() {
         console.log('Init');
         FB.init({
-            appId      : 246172146824778,
+            appId      : '246172146824778',
             cookie     : true,                     // Enable cookies to allow the server to access the session.
             xfbml      : true,                     // Parse social plugins on this webpage.
-            version    : 8.0           // Use this Graph API version for this call.
+            version    : 'v8.0'           // Use this Graph API version for this call.
         });
     
     
@@ -51,8 +51,7 @@
         console.log('Welcome!  Fetching your information.... ');
         FB.api('/me', function(response) {
             console.log('Successful login for: ' + response.name);
-            document.getElementById('status').innerHTML =
-            'Thanks for logging in, ' + response.name + '!';
+            // document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';
         });
         }
     
