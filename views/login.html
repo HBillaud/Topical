@@ -6,7 +6,7 @@
 </head>
 <body style="margin-top: 100px">
     <!-- <div id="fb-root"></div> -->
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v8.0&appId=246172146824778" nonce="5Wp19Fc0"></script>
+    <!-- <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v8.0&appId=246172146824778" nonce="5Wp19Fc0"></script> -->
     <script>
 
         function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
@@ -19,13 +19,12 @@
             // document.getElementById('status').innerHTML = 'Please log into this webpage.';
         }
         }
-    
+        
     
         function checkLoginState() {               // Called when a person is finished with the Login Button.
         FB.getLoginStatus(function(response) {   // See the onlogin handler
             statusChangeCallback(response);
             console.log('checkLoginState');
-            response.redirect('/');
         });
         }
     
@@ -54,6 +53,14 @@
             // document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';
         });
         }
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
     
     </script>
 
