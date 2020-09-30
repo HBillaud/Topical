@@ -36,6 +36,22 @@ app.get('/login', function(req, res) {
 	res.render('login');
 });
 
+app.get('/profile', function(req, res) {
+	res.render('profile');
+});
+
+app.get('/logout', function(req, res) {
+	res.redirect('/login');
+});
+
+app.get('/topics', function(req, res) {
+	res.render('topics');
+});
+
+app.get('/settings', function(req, res) {
+	res.render('settings');
+});
+
 app.post('/signup', users.signup);
 app.post('/login', users.login);
 

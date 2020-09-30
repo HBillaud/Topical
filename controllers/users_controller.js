@@ -39,3 +39,13 @@ exports.login = async function(req, res) {
         {password:req.body.password});
         */
 };
+
+/*
+    Facebook
+    const credentials = Realm.Credentials.facebook(token)
+    const user = await realmApp.logIn(credentials)
+
+    Google
+    const credentials = Realm.Credentials.google(token)
+    const user = await realmApp.logIn(credentials)
+*/
