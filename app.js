@@ -20,6 +20,9 @@ app.set('view engine', 'html');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public/assets'));
+app.use(express.static(__dirname + '/public/css'));
+app.use(express.static(__dirname + '/public/js'));
 app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/controllers'));
 
