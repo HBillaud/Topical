@@ -13,7 +13,7 @@
 
 </head>
 <body>
-
+    <!-- Navigation Bar Start -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white" style="border-bottom: 2px; border-color: black; border-bottom-width: 2px; border-bottom-style: solid;">
         <a class="navbar-brand" href="/">
             <img src="fullLogo.svg" width="100" height="30" class="align-top" alt="" loading="lazy">
@@ -39,36 +39,130 @@
             </ul>
         </div>
     </nav>
+    <!-- Navigation Bar End -->
+
 	<h1>Settings</h1>
-	<form method="POST" style="margin-top: 30px;">
-		<div class="form-group" style="margin: auto;">
-			<h3>Change Your Information</h3>
-			<div class="form-group" style="width: 30%; ">
-				<label>Change Name</label>
-				<input type="text" class="form-control" name="NameChange">
-			</div>
-			<div class="form-group" style="width: 30%;">
-				<label>Change Bio</label>
-				<textarea class="form-control" rows="3" name="BioChange"></textarea>
-			</div>
-			<div class="form-group" style="margin: auto;">
-				<label>Change Profile Picture</label>
-				<input type="file" class="form-control-file" name="C">
-			</div>
-			<br>
-			<div class="form-group">
-                <button type="submit" value="SaveChanges" class="btn btn-primary">Save</button>
+    <!-- Change Picture Modal -->
+    <div class="modal fade" id="pictureModal" tabindex="-1" role="dialog" aria-labelledby="pictureModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Profile Picture</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing profile pic -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <input type="file" class="form-control-file" name="newPicture">
+                            <br>
+                            <button type="submit" value="savePic" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
-		<br>
+    </div>
+    
+    <!-- Change Name Modal -->
+    <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Profile Picture</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing name -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <input type="text" class="form-control" name="NameChange"> 
+                            <br>
+                            <button type="submit" value="saveName" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Change Bio Modal -->
+    <div class="modal fade" id="bioModal" tabindex="-1" role="dialog" aria-labelledby="bioModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Profile Picture</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing bio -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <textarea class="form-control" rows="3" name="BioChange"></textarea>
+                            <br>
+                            <button type="submit" value="saveBio" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <h3>Change Your Information</h3>
+    
+    <label>Change Name</label>
+    <!-- ChangeName trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nameModal">
+        Edit
+    </button>
+    <br>
+  
+    <label>Change Bio</label>
+    <!-- ChangeBio trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bioModal">
+        Edit
+    </button>
+    <br>
+
+    <label>Change Profile Picture</label>
+    <!-- ChangePicture trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pictureModal">
+        Edit
+    </button>
+    <br>
+    
+    <!-- ChangePass+Logout+Delete Account post form -->
+    <form method="POST" style="margin-top: 30px;">
 		<div class="form-group" style="margin: auto;">
 			<h3>Do you need to change passwords?</h3>
-            <button type="submit" value="ChangePass" class="btn btn-primary">Change Password</button>
+            <button type="submit" value="changePass" class="btn btn-primary">Change Password</button>
         </div>
 		<br>
 		<div class="form-group" style="margin: auto;">
 			<h3>Do you wish to logout?</h3>
-               <button type="submit" value="Logout" class="btn btn-outline-dark">Logout</button>
+               <button type="submit" value="logout" class="btn btn-outline-dark">Logout</button>
+        </div>
+        <br>
+		<div class="form-group" style="margin: auto;">
+			<h3>Do you wish to delete your account?</h3>
+               <button type="submit" value="delete" class="btn btn-outline-dark">Delete</button>
         </div>
     </form>
 
