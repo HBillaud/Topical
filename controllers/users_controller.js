@@ -1,4 +1,5 @@
 const realm = require('realm');
+const bcrypt = require('bcrypt');
 
 const appId = "topical-gleqy";
 const appConfig = {
@@ -9,7 +10,9 @@ const realmApp = new realm.App(appConfig);
 
 exports.signup = async function(req, res) {                                                                  
     try {
-        await realmApp.emailPasswordAuth.registerUser(req.body.email, req.body.password);
+        // const salt = await bcrypt.genSalt(5);
+        // const hash = await bcrypt.hash(req.boby.password, salt);
+        await realmApp.emailPasswordAuth.registerUser(req.body.email, req.body.password); // replace req.body.password with hash
         console.log("Successfully signed up!");
         res.redirect('/login');
     } catch (err) {
@@ -38,6 +41,24 @@ exports.login = async function(req, res) {
         {email:req.body.email},
         {password:req.body.password});
         */
+};
+
+exports.logout = async function(req, res) {
+    try {
+        realmApp.currentUser.logOut();
+        res.redirect('login');
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+exports.delete = async function(req, res) {
+    try {
+        realmApp.removeUser(realmApp.currentUser);
+        res.redirect('signup');
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 /*

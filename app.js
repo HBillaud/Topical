@@ -57,6 +57,8 @@ app.get('/settings', function(req, res) {
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);
+app.post('/logout', users.logout);
+app.post('/delete', users.delete);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);

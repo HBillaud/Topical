@@ -152,17 +152,17 @@
     <form method="POST" style="margin-top: 30px;">
 		<div class="form-group" style="margin: auto;">
 			<h3>Do you need to change passwords?</h3>
-            <button type="submit" value="changePass" class="btn btn-primary">Change Password</button>
+            <button type="submit" formaction="/change_password" value="changePass" class="btn btn-primary">Change Password</button>
         </div>
 		<br>
 		<div class="form-group" style="margin: auto;">
 			<h3>Do you wish to logout?</h3>
-               <button type="submit" value="logout" class="btn btn-outline-dark">Logout</button>
+               <button type="submit" formaction="/logout" value="logout" class="btn btn-outline-dark">Logout</button>
         </div>
         <br>
 		<div class="form-group" style="margin: auto;">
 			<h3>Do you wish to delete your account?</h3>
-               <button type="submit" value="delete" class="btn btn-outline-dark">Delete</button>
+               <button type="submit" formaction="/delete" value="delete" class="btn btn-outline-dark">Delete</button>
         </div>
     </form>
 
