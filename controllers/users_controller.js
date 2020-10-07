@@ -1,5 +1,5 @@
 const realm = require('realm');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 
 const appId = "topical-gleqy";
 const appConfig = {
