@@ -43,9 +43,15 @@ app.get('/profile', function(req, res) {
 	res.render('profile');
 });
 
+app.get('/confirmEmail', function(req, res) {
+	res.render('confirm_email');
+});
+
+/*
 app.get('/logout', function(req, res) {
 	res.redirect('/login');
 });
+*/
 
 app.get('/topics', function(req, res) {
 	res.render('topics');
@@ -59,6 +65,7 @@ app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
+app.post('/confirmEmail', users.confirmEmail);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);

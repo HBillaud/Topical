@@ -46,6 +46,7 @@ exports.login = async function(req, res) {
 exports.logout = async function(req, res) {
     try {
         realmApp.currentUser.logOut();
+        console.log('User succesfully logged out!');
         res.redirect('login');
     } catch (err) {
         console.log(err);
@@ -56,6 +57,22 @@ exports.delete = async function(req, res) {
     try {
         realmApp.removeUser(realmApp.currentUser);
         res.redirect('signup');
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+exports.confirmEmail = async function(req, res) {
+    try {
+        const email = req.body.email;
+        
+        // extracting token and token id
+        const token = req.query.token;
+        const tokenId = req.query.tokenId;
+
+        await realmApp.emailPasswordAuth.confirmUser(token, tokenId);
+        console.log('User confirmed!');
+        res.redirect('/login');
     } catch (err) {
         console.log(err);
     }
