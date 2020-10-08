@@ -27,8 +27,8 @@ app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/controllers'));
 
 // set the home page route
-app.get('/', function(req, res) {
-		res.render('index');
+app.get('/', users.getUser, function(req, res) {
+	res.render('index');
 });
 
 app.get('/signup', function(req, res) {

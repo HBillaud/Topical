@@ -78,6 +78,20 @@ exports.confirmEmail = async function(req, res) {
     }
 };
 
+exports.getUser = async function(req, res) {
+    try {
+        if (!realmApp.currentUser) {
+            console.log('User not logged in... Redirecting to login');
+            res.redirect('/login');
+        } else {
+            console.log('Currently logged in as: ' + realmApp.currentUser.id);
+            res.render('index');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 /*
     Facebook
     const credentials = Realm.Credentials.facebook(token)
