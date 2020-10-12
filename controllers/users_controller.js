@@ -49,23 +49,22 @@ exports.logout = async function(req, res) {
         console.log('User succesfully logged out!');
         res.redirect('login');
     } catch (err) {
-        console.log(err);
+        console.error('Could not log user out', err);
     }
 };
 
 exports.delete = async function(req, res) {
     try {
         realmApp.removeUser(realmApp.currentUser);
+        console.log('User deleted!')
         res.redirect('signup');
     } catch (err) {
-        console.log(err);
+        console.error('Could not delete user', err);
     }
 };
 
 exports.confirmEmail = async function(req, res) {
     try {
-        const email = req.body.email;
-        
         // extracting token and token id
         const token = req.query.token;
         const tokenId = req.query.tokenId;
@@ -74,7 +73,7 @@ exports.confirmEmail = async function(req, res) {
         console.log('User confirmed!');
         res.redirect('/login');
     } catch (err) {
-        console.log(err);
+        console.error('Unsuccessful user confirmation', err);
     }
 };
 
@@ -88,9 +87,41 @@ exports.getUser = async function(req, res) {
             res.render('index');
         }
     } catch (err) {
-        console.log(err);
+        console.error('Could not get user info', err);
     }
-}
+};
+
+exports.forgotPassword = async function(req, res) {
+    try {
+        var email = req.body.email;
+        await realmApp.emailPasswordAuth.sendResetPasswordEmail(email);
+        console.log('Password reset email sent to: ' + email);
+        res.redirect('/login');
+    } catch (err) {
+        console.error('Could not send password reset email', err);
+    }
+};
+
+exports.resetPassword = async function(req, res) {
+    try {
+        if (req.body.password != req.body.confirmPassword) {
+            console.log('Two input fields are different!');
+        } else {
+            var password = req.body.password;
+
+            // extracting token and token id
+            var token = req.query.token;
+            var tokenId = req.query.tokenId;
+    
+            await realmApp.emailPasswordAuth.resetPassword(token, tokenId, password);
+            console.log('Password reset!');
+            res.redirect('/login');    
+        }
+    } catch (err) {
+        console.error('Could not reset password', err);
+    }
+};
+
 
 /*
     Facebook

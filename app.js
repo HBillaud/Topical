@@ -6,6 +6,7 @@ var app = express();
 
 // Including all controllers
 var users = require('./controllers/users_controller');
+const { ppid } = require('process');
 
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
@@ -43,15 +44,9 @@ app.get('/profile', function(req, res) {
 	res.render('profile');
 });
 
-app.get('/confirmEmail', function(req, res) {
-	res.render('confirm_email');
+app.get('/confirmEmail', users.confirmEmail, function(req, res) {
+	res.render('confirmEmail');
 });
-
-/*
-app.get('/logout', function(req, res) {
-	res.redirect('/login');
-});
-*/
 
 app.get('/topics', function(req, res) {
 	res.render('topics');
@@ -61,11 +56,20 @@ app.get('/settings', function(req, res) {
 	res.render('settings');
 });
 
+app.get('/forgotPassword', function(req, res) {
+	res.render('forgotPassword');
+});
+
+app.get('/resetPassword', function(req, res) {
+	res.render('resetPassword');
+});
+
 app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
-app.post('/confirmEmail', users.confirmEmail);
+app.post('/forgotPassword', users.forgotPassword);
+app.post('/resetPassword', users.resetPassword);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);
