@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
+const config = require("../config/auth.config");
 const User = require('../models/userSchema');
 
 exports.signup = async function(req, res) {                                                                  
@@ -10,11 +12,13 @@ exports.signup = async function(req, res) {
                 if (err) {
                     console.error(err);
                     res.redirect('/signup');
+                    return;
                 }
 
                 if (user) { // email is already in use
                     console.log('Email already in use!');
                     res.redirect('/signup');
+                    return;
                 }
 
                 // checking if username is already in use
@@ -23,11 +27,13 @@ exports.signup = async function(req, res) {
                         if (err) {
                             console.error(err);
                             res.redirect('/signup');
+                            return;
                         }
 
                         if (user) { // username already in use
                             console.log('Username already in use');
                             res.redirect('/signup');
+                            return;
                         }
                     });
             });
@@ -44,40 +50,109 @@ exports.signup = async function(req, res) {
 
         console.log("Successfully signed up!");
         res.redirect('/login');
+        return;
     } catch (err) {
         console.error("Failed to sign up!", err);
         res.redirect('/signup');
+        return;
     }
 };
 
 exports.login = async function(req, res) {
     try {
-        var email = req.body.email;
+        var cred = req.body.cred;
         var password = req.body.password;
 
-        User.findOne({ email: email}, function(err, doc) {
-            if (err) { throw err; }
+        if (cred.indexOf('@') > -1) {
+            User.findOne({ email: cred}, function(err, user) {
+                if (err) { throw err; }
+    
+                if (!user) {
+                    res.redirect('/login');
+                    console.log('User does not exist!');
+                    return;
+                } else {
+                    bcrypt.compare(password, user.password, function (err, result) {
+                        if (err) throw err;
+    
+                        if (result) { // passwords match
+                            console.log('Successfully logged in!');
+                            // generate token
+                            const token = jwt.sign({ id: user.id }, config.secret, {
+                                expiresIn: 60
+                            });
+                    
+                            res.cookie('x-access-token', token);
+                            res.redirect('/');
+                            return;
+                        } else {
+                            console.log('Incorrect password');
+                            res.redirect('/login');
+                            return;
+                        }
+                    });
+                }
+            });
+        } else {
+            User.findOne({ username: cred}, function(err, user) {
+                if (err) { throw err; }
 
-            if (!doc) {
-                res.redirect('/login');
-                console.log('User does not exist!');
-            } else {
-                bcrypt.compare(password, doc.password, function (err, result) {
-                    if (err) throw err;
+                if (!user) {
+                    res.redirect('/login');
+                    console.log('User does not exist!');
+                    return;
+                } else {
+                    bcrypt.compare(password, user.password, function (err, result) {
+                        if (err) throw err;
+    
+                        if (result) { // passwords match
+                            console.log('Successfully logged in!');
+                            // generate token
+                            const token = jwt.sign({ id: user.id }, config.secret, {
+                                expiresIn: 60
+                            });
+                    
+                            res.cookie('x-access-token', token);
+                            res.redirect('/');
+                            return;
+                        } else {
+                            console.log('Incorrect password');
+                            res.redirect('/login');
+                            return;
+                        }
+                    }); 
+                }
+            });
+        }
 
-                    if (result) { // passwords match
-                        console.log('Successfully logged in!');
-                        res.redirect('/');
-                    } else {
-                        console.log('Incorrect password');
-                        res.redirect('/login');
-                    }
-                })
-            }
-        });
     } catch (err) {
         console.error("Failed to log in!", err);
         res.redirect('/login');
+    }
+};
+
+exports.verifyToken = async function(req, res, next) {
+    try {
+        let token = req.cookies["x-access-token"];
+
+        if (!token) {
+            res.redirect('/login');
+            console.log('User not logged in!'); 
+            return;
+        }
+        console.log(token);
+        jwt.verify(token, config.secret, (err, decoded) => {
+            if (err) {
+                console.log('Unauthorized: invalid token');
+                res.redirect('/login');
+                return;
+            }
+
+            //req.id = decoded.id;
+        });
+        next();
+    } catch (err) {
+        console.log();
     }
 };
 
