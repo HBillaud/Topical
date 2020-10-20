@@ -5,11 +5,11 @@
 <link rel="icon" href="smallLogo.png" type="image/png">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 <meta name="google-signin-client_id" content="394600517410-2799cseeldeqrq4imc1pl1qg2jqvnrs8.apps.googleusercontent.com">
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body style="margin-top: 100px">
     <!-- <div id="fb-root"></div> -->
     <!-- <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v8.0&appId=246172146824778" nonce="5Wp19Fc0"></script> -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>
         function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
         console.log('statusChangeCallback');
@@ -87,7 +87,11 @@
                         console.log('Name: ' + profile.getName());
                         console.log('Image URL: ' + profile.getImageUrl());
                         console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-                        }
+                    
+                        // The ID token you need to pass to your backend:
+                        var id_token = googleUser.getAuthResponse().id_token;
+                        
+                    }
                 </script>
                 <div class="g-signin2" data-onsuccess="onSignIn"></div>
             </div>

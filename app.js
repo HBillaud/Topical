@@ -1,12 +1,24 @@
 const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 var app = express();
 
 // Including all controllers
 var users = require('./controllers/users_controller');
 const { ppid } = require('process');
+
+// Including all schemas
+const User = require('./models/userSchema');
+const Post = require('./models/postSchema');
+
+const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
+
+mongoose.Promise = global.Promise;
+mongoose.connect(ATLAS_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+	.then(() => console.log('connection succesful'))
+	.catch((err) => console.error(err));
 
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
@@ -68,6 +80,7 @@ app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
+app.post('/settings', users.updateUser);
 app.post('/forgotPassword', users.forgotPassword);
 app.post('/resetPassword', users.resetPassword);
 
