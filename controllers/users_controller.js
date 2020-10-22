@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require("../config/auth.config");
 const User = require('../models/userSchema');
 
+// DONE
 exports.signup = async function(req, res) {                                                                  
     try {
         User.findOne({ email: req.body.email })
@@ -58,6 +59,7 @@ exports.signup = async function(req, res) {
     }
 };
 
+// DONE
 exports.login = async function(req, res) {
     try {
         var cred = req.body.cred;
@@ -109,7 +111,7 @@ exports.login = async function(req, res) {
                             console.log('Successfully logged in!');
                             // generate token
                             const token = jwt.sign({ id: user.id }, config.secret, {
-                                expiresIn: 60
+                                expiresIn: 86400 // 24 hours
                             });
                     
                             res.cookie('x-access-token', token);
@@ -131,6 +133,7 @@ exports.login = async function(req, res) {
     }
 };
 
+// DONE
 exports.verifyToken = async function(req, res, next) {
     try {
         let token = req.cookies["x-access-token"];
@@ -138,21 +141,22 @@ exports.verifyToken = async function(req, res, next) {
         if (!token) {
             res.redirect('/login');
             console.log('User not logged in!'); 
-            return;
+            next();
         }
         console.log(token);
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
                 console.log('Unauthorized: invalid token');
                 res.redirect('/login');
-                return;
+                next();
             }
 
             //req.id = decoded.id;
         });
         next();
     } catch (err) {
-        console.log();
+        console.log('Could not verify token: ', err);
+        next();
     }
 };
 

@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
-  title: {
+  description: {
     type: String,
-    required: [true, 'Username is required']
+    required: true
+  },
+  img: {
+    data: Buffer,
+    contentType: String
   },
   created: {
     type: Date,
