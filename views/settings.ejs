@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Topical</title>
+
+    <!-- CSS -->
+    <!-- load bootstrap and our own personal stylesheet -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="icon" href="smallLogo.png" type="image/png">
+    <script src="/angular/angular.js"></script>
+
+</head>
+<body>
+    <!-- Navigation Bar Start -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white" style="border-bottom: 2px; border-color: black; border-bottom-width: 2px; border-bottom-style: solid;">
+        <a class="navbar-brand" href="/">
+            <img src="fullLogo.svg" width="100" height="30" class="align-top" alt="" loading="lazy">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/topics">Topics</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/settings">Settings</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Navigation Bar End -->
+
+	<h1>Settings</h1>
+    <!-- Change Picture Modal -->
+    <div class="modal fade" id="pictureModal" tabindex="-1" role="dialog" aria-labelledby="pictureModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Profile Picture</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing profile pic -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <input type="file" class="form-control-file" name="newPicture">
+                            <br>
+                            <button type="submit" value="savePic" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Name Modal -->
+    <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="nameModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing name -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <input type="text" class="form-control" name="NameChange"> 
+                            <br>
+                            <button type="submit" formaction="/editName" value="editName" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Change Bio Modal -->
+    <div class="modal fade" id="bioModal" tabindex="-1" role="dialog" aria-labelledby="bioModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PictureModalLabel">Change Bio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- post form for changing bio -->
+                    <form method="POST" style="margin-top: 30px;">
+                        <div class="form-group" style="margin: auto;">
+                            <textarea class="form-control" rows="3" name="BioChange"></textarea>
+                            <br>
+                            <button type="submit" value="saveBio" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <h3>Change Your Information</h3>
+    
+    <label>Change Name</label>
+    <!-- ChangeName trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nameModal">
+        Edit
+    </button>
+    <br>
+  
+    <label>Change Bio</label>
+    <!-- ChangeBio trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bioModal">
+        Edit
+    </button>
+    <br>
+
+    <label>Change Profile Picture</label>
+    <!-- ChangePicture trigger modal -->
+    <br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pictureModal">
+        Edit
+    </button>
+    <br>
+    
+    <!-- ChangePass+Logout+Delete Account post form -->
+    <form method="POST" style="margin-top: 30px;">
+		<div class="form-group" style="margin: auto;">
+			<h3>Do you need to change passwords?</h3>
+            <button type="submit" formaction="/change_password" value="changePass" class="btn btn-primary">Change Password</button>
+        </div>
+		<br>
+		<div class="form-group" style="margin: auto;">
+			<h3>Do you wish to logout?</h3>
+               <button type="submit" formaction="/logout" value="logout" class="btn btn-outline-dark">Logout</button>
+        </div>
+        <br>
+		<div class="form-group" style="margin: auto;">
+			<h3>Do you wish to delete your account?</h3>
+               <button type="submit" formaction="/delete" value="delete" class="btn btn-outline-dark">Delete</button>
+        </div>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</body>
+</html>

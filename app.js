@@ -4,6 +4,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 
+
+const jwt = require('jsonwebtoken');
+//const config = require("../config/auth.config");
+
+
 var app = express();
 
 // Including all controllers
@@ -13,6 +18,7 @@ const { ppid } = require('process');
 // Including all schemas
 const User = require('./models/userSchema');
 const Post = require('./models/postSchema');
+
 
 const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
 
@@ -29,7 +35,7 @@ app.set('views', __dirname + "/views");
 
 // set the view engine to ejs
 app.engine('html', require('ejs').renderFile);
-app.set('view engine', 'html');
+app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -54,9 +60,24 @@ app.get('/login', function(req, res) {
 	res.render('login');
 });
 
-app.get('/profile', users.verifyToken, function(req, res) {
+/*app.get('/profile', users.verifyToken, function(req, res) {
 	res.render('profile');
+});*/
+
+app.get('/profile', users.verifyToken, async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var userId = decoded.id;
+
+	User.findById(userId, function(err, foundUser) {
+		if (err) {
+			console.log("Error: Could Not Find User");
+			res.redirect("/");
+		}
+		res.render('profile', {user: foundUser});
+	});
 });
+
 
 app.get('/confirmEmail', users.confirmEmail, function(req, res) {
 	res.render('confirmEmail');
@@ -85,6 +106,8 @@ app.post('/delete', users.delete);
 app.post('/settings', users.updateUser);
 app.post('/forgotPassword', users.forgotPassword);
 app.post('/resetPassword', users.resetPassword);
+
+app.post('/editName', users.editUsername);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);

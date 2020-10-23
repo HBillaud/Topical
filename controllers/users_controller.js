@@ -206,6 +206,35 @@ exports.getUser = async function(req, res) {
     }
 };
 
+exports.editUsername = async function(req,res) {
+    let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+    var userId = decoded.id;
+    var newName = req.body.NameChange;
+
+    User.findById(userId, function(err, foundUser) {
+		if (err) {
+			console.log("ERROR: UserID was invalid/user does not exist");
+			res.redirect("/");
+        }
+        //user exists
+        const query = {"_id": {$eq: userId}};
+        const update = {$set : { "username": newName}}
+        const options = { "upsert": false };
+
+        try {
+            User.updateOne(query, update, options).then(() => {
+                console.log("Successfully updated");
+            });
+        } catch {
+            console.log("ERROR: update failed, maybe user was not found");
+        }
+        res.redirect('settings'); //, {user: foundUser});
+        
+    });
+    
+}
+
 exports.forgotPassword = async function(req, res) {
     try {
         var email = req.body.email;
