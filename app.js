@@ -69,7 +69,7 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var userId = decoded.id;
 
-	User.findById(userId, function(err, foundUser) {
+	await User.findById(userId, function(err, foundUser) {
 		if (err) {
 			console.log("Error: Could Not Find User");
 			res.redirect("/");
@@ -107,7 +107,9 @@ app.post('/settings', users.updateUser);
 app.post('/forgotPassword', users.forgotPassword);
 app.post('/resetPassword', users.resetPassword);
 
-app.post('/editName', users.editUsername);
+app.post('/editName', users.editName);
+app.post('/editBio', users.editBio);
+app.post('/editPicture', users.editPicture);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);

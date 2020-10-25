@@ -54,13 +54,20 @@
                 </div>
                 <div class="modal-body">
                     <!-- post form for changing profile pic -->
-                    <form method="POST" style="margin-top: 30px;">
+                     <!-- <form method="POST" style="margin-top: 30px;">
                         <div class="form-group" style="margin: auto;">
                             <input type="file" class="form-control-file" name="newPicture">
                             <br>
                             <button type="submit" value="savePic" class="btn btn-primary">Save Changes</button>
                         </div>
-                    </form> 
+                    </form> -->
+                    <form method="POST" style="margin-top: 30px;">
+                            <input type="text" class="form-control" name="PictureURL"> 
+                            <br>
+                            <button type="submit" formaction="/editPicture" value="savePic" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                    
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -111,7 +118,7 @@
                         <div class="form-group" style="margin: auto;">
                             <textarea class="form-control" rows="3" name="BioChange"></textarea>
                             <br>
-                            <button type="submit" value="saveBio" class="btn btn-primary">Save Changes</button>
+                            <button type="submit" formaction="/editBio" value="saveBio" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form> 
                 </div>

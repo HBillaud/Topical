@@ -40,11 +40,15 @@ exports.signup = async function(req, res) {
 
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(req.body.confirmPassword, salt);
-        
+       
+
         var user = new User({
             username: req.body.username,
             email: req.body.email,
             password: hash,
+            name: req.body.firstname + " " + req.body.lastname,
+            bio: null,
+            picture: null,
             created: Date.now()
         }).save();
 
@@ -206,33 +210,67 @@ exports.getUser = async function(req, res) {
     }
 };
 
-exports.editUsername = async function(req,res) {
+exports.editName = async function(req,res) {
     let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
     var userId = decoded.id;
     var newName = req.body.NameChange;
 
-    User.findById(userId, function(err, foundUser) {
-		if (err) {
-			console.log("ERROR: UserID was invalid/user does not exist");
-			res.redirect("/");
-        }
-        //user exists
-        const query = {"_id": {$eq: userId}};
-        const update = {$set : { "username": newName}}
-        const options = { "upsert": false };
+    const query = {"_id": {$eq: userId}};
+    const update = {$set : { "name": newName}}
+    const options = { "upsert": false };
 
-        try {
-            User.updateOne(query, update, options).then(() => {
-                console.log("Successfully updated");
-            });
-        } catch {
-            console.log("ERROR: update failed, maybe user was not found");
-        }
-        res.redirect('settings'); //, {user: foundUser});
-        
-    });
-    
+    try {
+        await User.updateOne(query, update, options).then(() => {
+            console.log("Successfully updated");
+        });
+    } catch {
+        console.log("ERROR: update to user failed");
+    }
+    res.redirect('settings'); //, {user: foundUser});   
+}
+
+//Practically identical to editname, can be combined into the same function
+
+exports.editBio = async function(req,res) {
+    let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+    var userId = decoded.id;
+    var newBio = req.body.BioChange;
+
+    const query = {"_id": {$eq: userId}};
+    const update = {$set : { "bio": newBio}}
+    const options = { "upsert": false };
+
+    try {
+        await User.updateOne(query, update, options).then(() => {
+            console.log("Successfully updated");
+        });
+    } catch {
+        console.log("ERROR: update to user failed");
+    }
+    res.redirect('settings'); //, {user: foundUser});   
+}
+
+exports.editPicture = async function(req,res) {
+    let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+    var userId = decoded.id;
+    var newPic = req.body.PictureURL;
+
+
+    const query = {"_id": {$eq: userId}};
+    const update = {$set : { "picture": newPic}}
+    const options = { "upsert": false };
+
+    try {
+        await User.updateOne(query, update, options).then(() => {
+            console.log("Successfully updated");
+        });
+    } catch {
+        console.log("ERROR: update to user failed");
+    }
+    res.redirect('settings'); //, {user: foundUser});   
 }
 
 exports.forgotPassword = async function(req, res) {
