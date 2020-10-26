@@ -15,6 +15,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required']
   },
+  name: {
+    type: String,
+    required: [true, 'Name is required']
+  },
+  bio: {
+    type: String,
+    required: [false, 'Bio is not required']
+  },
+  picture: {
+    type: String,
+    required: [false, 'Picture is not required']
+  },
   created: {
     type: Date,
     required: [true, 'Created date is required']
