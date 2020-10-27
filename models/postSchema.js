@@ -9,6 +9,14 @@ const postSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String
   },
+  author: {
+    type: String,
+    required: true
+  },
+  anonymous: {
+    type: Boolean,
+    default: false
+  },
   created: {
     type: Date,
     required: [true, 'Created date is required']

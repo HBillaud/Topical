@@ -257,7 +257,7 @@ exports.verifyToken = async function(req, res, next) {
 
 exports.logout = async function(req, res) {
     try {
-        // realmApp.currentUser.logOut();
+        res.cookie("x-access-token", null);        
         console.log('User succesfully logged out!');
         res.redirect('/login');
     } catch (err) {
@@ -268,7 +268,27 @@ exports.logout = async function(req, res) {
 
 exports.delete = async function(req, res) {
     try {
-        // realmApp.removeUser(realmApp.currentUser);
+        // Maybe run log out function prior to deleting user
+        let token = req.cookies["x-access-token"];
+        const decoded = jwt.verify(token, "topical-123456789");  
+        var userId = decoded.id;
+
+        await User.findById(userId, function(err, foundUser) {
+            if (err) {
+                console.log("Error: Could Not Find User");
+                res.redirect("/settings");
+                return;
+            }
+
+            User.deleteOne({ email: foundUser.email }, function(err) {
+                if (err) {
+                    console.error("Could not delete user!", err);
+                    res.redirect('/settings');
+                    return;
+                }
+            });
+            // res.render('profile', {user: foundUser});
+        });
         console.log('User deleted!')
         res.redirect('/signup');
     } catch (err) {
