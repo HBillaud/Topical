@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-
+const {check} = require('express-validator');
 
 const jwt = require('jsonwebtoken');
 //const config = require("../config/auth.config");
@@ -91,21 +91,32 @@ app.get('/settings', users.verifyToken, function(req, res) {
 	res.render('settings');
 });
 
-app.get('/forgotPassword', function(req, res) {
-	res.render('forgotPassword');
-});
 
-app.get('/resetPassword', function(req, res) {
+/*app.get('/resetPassword', function(req, res) {
 	res.render('resetPassword');
-});
+});*/
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
 app.post('/settings', users.updateUser);
-app.post('/forgotPassword', users.forgotPassword);
-app.post('/resetPassword', users.resetPassword);
+
+// password reset routes
+app.get('/forgotPassword',  function(req, res) {
+	res.render('forgotPassword');
+});
+//app.post('/forgotPassword', users.forgotPassword);
+
+app.post('/recoverPassword', users.recover);
+
+app.get('/reset/:token', users.reset);
+
+app.post('/reset/:token', [
+	check('password').not().isEmpty().isLength({min: 6}).withMessage('Must be at least 6 chars long'),
+	check('confirmPassword', 'Passwords do not match').custom((value, {req}) => (value === req.body.password))	
+], users.resetPassword);
+
 
 app.post('/editName', users.editName);
 app.post('/editBio', users.editBio);

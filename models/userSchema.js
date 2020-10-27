@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -21,7 +24,8 @@ const userSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
-    required: [false, 'Bio is not required']
+    required: [false, 'Bio is not required'],
+    max: 512
   },
   picture: {
     type: String,
@@ -30,7 +34,21 @@ const userSchema = new mongoose.Schema({
   created: {
     type: Date,
     required: [true, 'Created date is required']
+  },
+  resetPasswordToken: {
+    type: String,
+    required: false
+  },
+
+  resetPasswordExpires: {
+    type: Date,
+    required: false
   }
-});
+}, {timestamps: true});
+
+userSchema.methods.generatePasswordReset = function() {
+  this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+  this.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
+};
 
 module.exports = mongoose.model('User', userSchema);  // export userSchema
