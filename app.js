@@ -16,11 +16,14 @@ var app = express();
 // Including all controllers
 var users = require('./controllers/users_controller');
 var posts = require('./controllers/posts_controller');
+var topics = require('./controllers/topics_controller');
+
 const { ppid } = require('process');
 
 // Including all schemas
 const User = require('./models/userSchema');
 const Post = require('./models/postSchema');
+const Topic = require('./models/topicSchema');
 
 
 const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
@@ -120,7 +123,7 @@ app.post('/reset/:token', [
 	check('confirmPassword', 'Passwords do not match').custom((value, {req}) => (value === req.body.password))	
 ], users.resetPassword);
 
-app.post('/createPost', posts.create);
+app.post('/createPost', posts.create, topics.check);
 
 app.post('/editName', users.editName);
 app.post('/editBio', users.editBio);

@@ -4,7 +4,7 @@ const config = require("../config/auth.config");
 
 const Post = require('../models/postSchema');
 
-exports.create = async function(req, res) {
+exports.create = async function(req, res, next) {
     try {
         var anonymous = false;
         if (req.body.anonymousCheck == "1") { anonymous = true; }
@@ -30,4 +30,11 @@ exports.create = async function(req, res) {
     } catch (err) {
         console.error("Failed to create post!", err);
     }
+    next();
+};
+
+exports.fetch = async function(req, res) {
+    // retrieve topic selected by user
+    // query all posts with that specific topic
+    // send array of posts to frontend to display 
 };
