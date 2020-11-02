@@ -5,8 +5,10 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const {check} = require('express-validator');
 
+
 const jwt = require('jsonwebtoken');
 //const config = require("../config/auth.config");
+
 
 
 var app = express();

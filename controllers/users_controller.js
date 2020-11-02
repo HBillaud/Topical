@@ -1,12 +1,20 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
 
 const config = require("../config/auth.config");
 const User = require('../models/userSchema');
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+//for nodemailer setup
+let transporter = nodemailer.createTransport({
+    service: process.env.SERVICE,
+    auth: {
+      user: process.env.MAILER_EMAIL,
+      pass: process.env.MAILER_PASS
+    }
+  });
+
 
 // recover email 
 exports.recover = async function(req, res) {
@@ -31,7 +39,7 @@ exports.recover = async function(req, res) {
                     If you did not request this, please ignore this email and your password will remain unchanged.\n`,
                     };
 
-                    sgMail.send(mailOptions, (error, result) => {
+                    transporter.sendMail(mailOptions, (error, result) => {
                         if (error) return res.status(500).json({message: error.message});
 
                         res.status(200).json({message: 'A reset email has been sent to ' + user.email + '.'});
@@ -40,7 +48,7 @@ exports.recover = async function(req, res) {
                 .catch(err => res.status(500).json({message: err.message}));
         })
         .catch(err => res.status(500).json({message: err.message}));
-    res.redirect("/login");
+    //res.redirect("/login");
 };
 
 //get reset page
@@ -84,7 +92,7 @@ exports.resetPassword = async function(req, res) {
                     This is a confirmation that the password for your account ${user.email} has just been changed.\n`
                 };
 
-                sgMail.send(mailOptions, (error, result) => {
+                transporter.sendMail(mailOptions, (error, result) => {
                     if (error) return res.status(500).json({message: error.message});
 
                     res.status(200).json({message: 'Your password has been updated.'});
