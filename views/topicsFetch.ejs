@@ -73,10 +73,13 @@
             </div>
             <div class="card-footer border-dark">
                 <!-- Like and dislike buttons -->
-                <small class="text-muted">Posted by</small>
-                <a href="/<%= posts[i].author %>">
-                    <%= posts[i].author %>
-                </a>
+                <% if (posts[i].anonymous == true) { %>
+                <small class="text-muted">Posted by Anonymous</small>
+                <% } else { %>
+                    <small class="text-muted">Posted by</small>
+                    <a href="/<%= posts[i].author %>">
+                        <%= posts[i].author %>
+                    </a> <% } %>
                 <small class="text-muted">on <%= posts[i].created %></small>
             </div>
         </div>

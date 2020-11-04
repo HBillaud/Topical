@@ -11,33 +11,38 @@ exports.create = async function(req, res, next) {
         let token = req.cookies["x-access-token"];
         const decoded = jwt.verify(token, "topical-123456789");  
         var userId = decoded.id;
-        var username;
 
         // retrieving user's username
-        User.findOne({ _id : userId})
-            .then(user => {
-                username = user.username;
+        User.findOne({ _id : userId })
+            .exec((err, user) => {
+                if (err) throw err;
+
+                if (!user) console.log('No user found');
+                else {
+                    var name = user.username;
+                    console.log(user.username);
+                    console.log('Author of post: ' + name);
+                    var anonymous = false;
+                    if (req.body.anonymousCheck == "1") { anonymous = true; }
+
+                    var post = new Post({
+                        title: req.body.title,
+                        topic: req.body.topic,
+                        description: req.body.description,
+                        /*
+                        img: { 
+                            data: fs.readFileSync(req.file.path),
+                            contentType: 'image/png'
+                        },
+                        */
+                        img: req.body.imgURL,
+                        author: name,
+                        anonymous: anonymous,
+                        score: 0,
+                        created: Date.now()
+                    }).save();  // creating post in DB
+                }
             });
-
-        var anonymous = false;
-        if (req.body.anonymousCheck == "1") { anonymous = true; }
-
-        var post = new Post({
-            title: req.body.title,
-            topic: req.body.topic,
-            description: req.body.description,
-            /*
-            img: { 
-                data: fs.readFileSync(req.file.path),
-                contentType: 'image/png'
-            },
-            */
-            img: req.body.imgURL,
-            author: username,
-            anonymous: anonymous,
-            score: 0,
-            created: Date.now()
-        }).save();  // creating post in DB
 
         console.log("Post successfully created!");
         res.redirect('/');
