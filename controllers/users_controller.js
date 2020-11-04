@@ -184,7 +184,7 @@ exports.login = async function(req, res) {
                             console.log('Successfully logged in!');
                             // generate token
                             const token = jwt.sign({ id: user.id }, config.secret, {
-                                expiresIn: 60
+                                expiresIn: 86400
                             });
                     
                             res.cookie('x-access-token', token);

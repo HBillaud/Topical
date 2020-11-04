@@ -17,6 +17,7 @@ var app = express();
 var users = require('./controllers/users_controller');
 var posts = require('./controllers/posts_controller');
 var topics = require('./controllers/topics_controller');
+var follows = require('./controllers/follows_controller');
 
 const { ppid } = require('process');
 
@@ -24,6 +25,7 @@ const { ppid } = require('process');
 const User = require('./models/userSchema');
 const Post = require('./models/postSchema');
 const Topic = require('./models/topicSchema');
+const Follower = require(__dirname + '/models/followerSchema');
 
 
 const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
@@ -73,17 +75,52 @@ app.get('/login', function(req, res) {
 app.get('/profile', users.verifyToken, async function(req, res) {
 	let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
-	var userId = decoded.id;
+	var currUserId = decoded.id;
 
-	await User.findById(userId, function(err, foundUser) {
-		if (err) {
-			console.log("Error: Could Not Find User");
-			res.redirect("/");
-		}
+	await User.findById(currUserId, function(err, foundUser) {
 		res.render('profile', {user: foundUser});
-	});
+	}).catch(err => res.status(500).json({message: err.message}));
 });
 
+app.get('/user/:id', users.verifyToken, async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	var otherUserId = req.params.id;
+	
+	var isFollow = false;
+	await Follower.findOne({
+		$and: [
+			{
+				followeeId: otherUserId
+			},
+			{
+				followerId: currUserId
+			}
+		]},
+		function(err, result) {
+			if (result) isFollow = true;
+		});
+
+	await User.findById(otherUserId, function(err, foundUser) {		
+		if(err || foundUser == null) {
+			//req.flash("error", "Something went wrong.");
+			return res.redirect("/");
+		  }
+
+		if (currUserId == otherUserId) {
+			res.render('profile', {user: foundUser});
+		}
+		else {
+			res.render('user', {user: foundUser, isFollowing: isFollow });
+		}
+	});
+})
+
+//followers routes
+app.post('/user/:id', follows.handleFollow );
+//app.post('/unfollowUser', Follower.unfollow);
 
 app.get('/confirmEmail', users.confirmEmail, function(req, res) {
 	res.render('confirmEmail');
@@ -97,10 +134,6 @@ app.get('/settings', users.verifyToken, function(req, res) {
 	res.render('settings');
 });
 
-
-/*app.get('/resetPassword', function(req, res) {
-	res.render('resetPassword');
-});*/
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);
