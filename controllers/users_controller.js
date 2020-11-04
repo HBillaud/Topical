@@ -407,29 +407,6 @@ exports.forgotPassword = async function(req, res) {
     }
 };
 
-/*exports.resetPassword = async function(req, res) {
-    try {
-        if (req.body.password != req.body.confirmPassword) {
-            console.log('Two input fields are different!');
-        } else {
-            var password = req.body.password;
-
-            // extracting token and token id
-            var token = req.query.token;
-            var tokenId = req.query.tokenId;
-
-            console.log(token);
-            console.log(tokenId);
-    
-            // await realmApp.emailPasswordAuth.resetPassword(token, tokenId, password);
-            console.log('Password reset!');
-            res.redirect('/login');    
-        }
-    } catch (err) {
-        console.error('Could not reset password', err);
-    }
-};*/
-
 exports.updateUser = async function(req, res) {
     try {
         

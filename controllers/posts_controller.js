@@ -1,11 +1,24 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 // const fs = require('fs');
 const config = require("../config/auth.config");
 
 const Post = require('../models/postSchema');
+const User = require('../models/userSchema');
 
 exports.create = async function(req, res, next) {
     try {
+        let token = req.cookies["x-access-token"];
+        const decoded = jwt.verify(token, "topical-123456789");  
+        var userId = decoded.id;
+        var username;
+
+        // retrieving user's username
+        User.findOne({ _id : userId})
+            .then(user => {
+                username = user.username;
+            });
+
         var anonymous = false;
         if (req.body.anonymousCheck == "1") { anonymous = true; }
 
@@ -20,8 +33,9 @@ exports.create = async function(req, res, next) {
             },
             */
             img: req.body.imgURL,
-            author: "HBillaud",
+            author: username,
             anonymous: anonymous,
+            score: 0,
             created: Date.now()
         }).save();  // creating post in DB
 
@@ -33,8 +47,62 @@ exports.create = async function(req, res, next) {
     next();
 };
 
-exports.fetch = async function(req, res) {
-    // retrieve topic selected by user
-    // query all posts with that specific topic
-    // send array of posts to frontend to display 
+exports.upvote = async function(req, res) {
+    // retrieve post id - req.params.postId
+    // query db for specific post using id
+    // increment the post's score
+    console.log('postId { ' + req.params.postId + ' }');
+    await Post.findOne({ _id : req.params.postId})
+        .exec((err, post) => {
+            if (err) throw err;
+
+            if (!post) console.log('Post with id { ' + req.params.postId + ' } not found');
+            else {
+                var increment = post.score + 1;
+                var update = { score: increment };
+                Post.findOneAndUpdate({ _id : req.params.postId} , update)
+                    .exec((err, result) => {
+                        if (err) throw err;
+
+                        if (!result) console.log('Upvote of post unsuccessful');
+                        else {
+                            // implement response
+                            console.log('Score updated!');
+                            res.redirect('/topics/'+req.params.topicTitle+'/');
+                        }
+                    });
+            }
+        });
+};
+
+exports.downvote = async function(req, res) {
+    // retrieve post id - req.params.postId
+    // query db for specific post using id
+    // increment the post's score
+    await Post.findOne({ _id : req.params.postId})
+        .exec((err, post) =>  {
+            if (err) throw err;
+
+            if (!post) console.log('Post with id { ' + req.params.postId + ' } not found');
+            else {
+                var decrement = post.score - 1;
+                var update = { score: decrement}
+                Post.findOneAndUpdate({ _id : req.params.postId }, update)
+                    .exec((err, result) => {
+                        if (err) throw err;
+
+                        if (!result) console.log('Downvote of post unsuccessful');
+                        else {
+                            // implement response
+                            console.log('Score updated!');
+                            res.redirect('/topics/'+req.params.topicTitle+'/');
+                        }
+                    })
+            }
+        })
+};
+
+exports.delete = async function(req, res) {
+    // retrieve post id - req.params.postId
+    // query db for findOneAndDelete()
 };

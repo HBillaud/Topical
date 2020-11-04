@@ -66,10 +66,6 @@ app.get('/login', function(req, res) {
 	res.render('login');
 });
 
-/*app.get('/profile', users.verifyToken, function(req, res) {
-	res.render('profile');
-});*/
-
 app.get('/profile', users.verifyToken, async function(req, res) {
 	let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
@@ -89,18 +85,44 @@ app.get('/confirmEmail', users.confirmEmail, function(req, res) {
 	res.render('confirmEmail');
 });
 
-app.get('/topics', users.verifyToken, function(req, res) {
-	res.render('topics');
+app.get('/topics', users.verifyToken, async function(req, res) {
+	// query all existing topics from DB
+    // send result to frontend to display
+    await Topic.find({ })
+        .exec((err, result) => {
+            if (err) { return; }
+
+            if (result) {
+                console.log('{ ' + result.length + ' } topics were fetched');
+                // send array of topics to frontend to display
+                res.render('topics', {topics: result});
+            }
+        });
+});
+
+app.get('/topics/:topicTitle/', async function(req, res) {
+	// retrieve topic selected by user - req.params.topicId
+    // query all posts with that specific topic
+	// send array of posts to frontend to display 
+	await Post.find({ topic: req.params.topicTitle })
+        .exec((err, posts) => {
+            if (err)  throw err;
+            if (!posts) console.log('No posts found!');
+            else {
+				Topic.find({ })
+					.exec((err, result) => {
+						res.render('topicsFetch', {topics: result, posts: posts});
+					});
+            }
+        });
 });
 
 app.get('/settings', users.verifyToken, function(req, res) {
 	res.render('settings');
 });
 
-
-/*app.get('/resetPassword', function(req, res) {
-	res.render('resetPassword');
-});*/
+app.post('/topics/:topicTitle/:postId/upvote', posts.upvote);
+app.post('/topics/:topicTitle/:postId/downvote', posts.downvote);
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);
@@ -112,7 +134,6 @@ app.post('/settings', users.updateUser);
 app.get('/forgotPassword',  function(req, res) {
 	res.render('forgotPassword');
 });
-//app.post('/forgotPassword', users.forgotPassword);
 
 app.post('/recoverPassword', users.recover);
 

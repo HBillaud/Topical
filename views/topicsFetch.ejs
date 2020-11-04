@@ -46,8 +46,43 @@
     <div class="list-group list-group-horizontal" style="margin-top: 10px; margin-left: 10px;">
         <% for(var i=0; i < topics.length; i++) { %>
             <a href="/topics/<%= topics[i].title %>/" class="btn btn-light list-group-item">t/<%= topics[i].title %> <span class="badge badge-primary badge-pill"><%= topics[i].numPosts %></span></a>
-         <% } %>
+        <% } %>
     </div>
+
+    <!-- Display posts associated with a topics when that topic is currently selected -->
+    <% for(var i=0; i < posts.length; i++) { %>
+        <div class="card border-dark" style="width: 50%; margin: auto; margin-top: 30px; text-align: center;">
+            <div class="card-body text-dark">
+                <h5 class="card-title"><%= posts[i].title %></h5>
+                <p class="card-text"><%= posts[i].description %></p>
+                <div class="row">
+                    <div class="col"> <!-- Modify formaction -->
+                        <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/upvote">
+                            <img src="/like.png" width="30px" height="30px">
+                        </button></form>
+                    </div>
+                    <div class="col">
+                        <p class="card-text">Score: <%= posts[i].score %></p>
+                    </div>
+                    <div class="col"> <!-- Modify formaction -->
+                        <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/downvote">
+                            <img src="/dislike.png" width="30px" height="30px">
+                        </button></form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer border-dark">
+                <!-- Like and dislike buttons -->
+                <small class="text-muted">Posted by</small>
+                <a href="/<%= posts[i].author %>">
+                    <%= posts[i].author %>
+                </a>
+                <small class="text-muted">on <%= posts[i].created %></small>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Display custom post data when user clicks on specific post (modal form?) -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
