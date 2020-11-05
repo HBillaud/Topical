@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
-const config = require("../config/auth.config");
 const Follower = require('../models/followerSchema');
+const User = require('../models/userSchema');
 
 /*
 followerSchema {
@@ -20,9 +20,20 @@ exports.handleFollow = async function(req,res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
     var currUserId = (decoded.id).toString();
     
-    var otherUserId = (req.params.id).toString();
-
+    var otherUserId;
     var check = req.body.press;
+
+    //find user in table
+    
+    await User.findOne({username: req.params.username}, function(err, user) {
+        if (err) {
+            console.log("User not found");
+            res.redirect("/");
+        }
+
+        if (user) otherUserId = (user.id).toString();
+    });
+    
 
     var query = {$and: [
         {
@@ -33,30 +44,35 @@ exports.handleFollow = async function(req,res) {
         }
     ]};
 
-    await Follower.findOne(query, function(err, result) {
-        
-            if ((result) && check == "unfollowUser") { //add follower
-                console.log("hi from delete result id: " + result.id);
-                Follower.findOneAndDelete(query, function (err, docs) { 
-                    if (err){ 
-                        console.log(err) 
-                    } 
-                    else{ 
-                        console.log("Deleted User : ", docs); 
-                        res.redirect("/user/" + req.params.id);
-                    }
-                });
+    if (check == "unfollowUser") { //remove follower
+        await Follower.findOneAndDelete(query, function (err, docs) { 
+            if (err){ 
+                console.log(err);
+            } 
+            else if (docs) { 
+                console.log("Deleted Follower Tuple : ", docs); 
             }
-            else if (check == "followUser" && (result == null)) {
-                    var follower = new Follower({
-                        followeeId: otherUserId,
-                        followerId: currUserId
-                    }).save();
+            res.redirect("/" + req.params.username);
+        });
+    }
+    else if (check == "followUser") { //add follower
+        var follower;
+        await Follower.findOne(query, function(err, result) {
+            if (err){ 
+                console.log(err);
+            } 
 
-                    res.redirect("/user/" + req.params.id);
+            if ((!result) || result.id == undefined) {
+                follower = new Follower({
+                    followeeId: otherUserId,
+                    followerId: currUserId
+                }).save();
+                console.log("Created Follower Tuple")
             }
 
-    }).catch(err => res.status(500).json({message: err.message}));
+            res.redirect("/" + req.params.username);
+        });
 
+    }
 }
 

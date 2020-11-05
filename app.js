@@ -25,7 +25,7 @@ const { ppid } = require('process');
 const User = require('./models/userSchema');
 const Post = require('./models/postSchema');
 const Topic = require('./models/topicSchema');
-const Follower = require(__dirname + '/models/followerSchema');
+const Follower = require('./models/followerSchema');
 
 
 const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
@@ -78,56 +78,20 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 	}).catch(err => res.status(500).json({message: err.message}));
 });
 
-app.get('/user/:id', users.verifyToken, async function(req, res) {
-	let token = req.cookies["x-access-token"];
-	const decoded = jwt.verify(token, "topical-123456789");  
-	var currUserId = decoded.id;
-
-	var otherUserId = req.params.id;
-	
-	var isFollow = false;
-	await Follower.findOne({
-		$and: [
-			{
-				followeeId: otherUserId
-			},
-			{
-				followerId: currUserId
-			}
-		]},
-		function(err, result) {
-			if (result) isFollow = true;
-		});
-
-	await User.findById(otherUserId, function(err, foundUser) {		
-		if(err || foundUser == null) {
-			//req.flash("error", "Something went wrong.");
-			return res.redirect("/");
-		  }
-
-		if (currUserId == otherUserId) {
-			res.render('profile', {user: foundUser});
-		}
-		else {
-			res.render('user', {user: foundUser, isFollowing: isFollow });
-		}
-	});
-})
-
-//followers routes
-app.post('/user/:id', follows.handleFollow );
-//app.post('/unfollowUser', Follower.unfollow);
-
 app.get('/confirmEmail', users.confirmEmail, function(req, res) {
 	res.render('confirmEmail');
 });
 
 app.get('/topics', users.verifyToken, async function(req, res) {
 	// query all existing topics from DB
-    // send result to frontend to display
+	// send result to frontend to display
+
     await Topic.find({ })
         .exec((err, result) => {
-            if (err) { return; }
+            if (err) { 
+				console.log(err);
+				return; 
+			}
 
             if (result) {
                 console.log('{ ' + result.length + ' } topics were fetched');
@@ -183,9 +147,72 @@ app.post('/reset/:token', [
 
 app.post('/createPost', posts.create, topics.check);
 
+//settings edit routes
 app.post('/editName', users.editName);
 app.post('/editBio', users.editBio);
 app.post('/editPicture', users.editPicture);
+
+
+app.get('/:username', users.verifyToken, async function(req, res) {
+	// get selected user's profile
+
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = (decoded.id);
+
+	var otherUserId;
+
+	//find user in table
+	await User.findOne({username: req.params.username}, function(err, user) {
+		if (err) {
+			console.log("User not found");
+			res.redirect("/");
+		}
+
+		if (user) otherUserId = (user.id);
+	});
+
+	if (otherUserId != undefined) {
+		//check if logged in user is following this user
+		var isFollow;
+		await Follower.findOne({
+			$and: [
+				{
+					followeeId: otherUserId
+				},
+				{
+					followerId: currUserId
+				}
+			]},
+			function(err, result) {
+				if (err) console.log("Follower not found");
+
+				if (result) isFollow = true;
+				else isFollow = false;
+				
+			});
+
+		await User.findById(otherUserId, function(err, foundUser) {		
+			if(err || foundUser == null) {
+				//req.flash("error", "Something went wrong.");
+				return res.redirect("/");
+			}
+
+			if (currUserId == otherUserId) {
+				res.render('profile', {user: foundUser});
+			}
+			else {
+				res.render('user', {user: foundUser, isFollowing: isFollow });
+			}
+		});
+	}
+	else { //query failed for otherUserId
+		res.redirect("/" + req.params.username)
+	}
+
+});
+app.post('/:username', follows.handleFollow);
+
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);
