@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 
 const followerSchema = new mongoose.Schema({
-    followeeId: {
+    followeeName: {
         type: String
     },
-    followerId: {
+    followerName: {
         type: String
+    },
+    IsUser: {
+        type: Boolean
     }
 });
 
