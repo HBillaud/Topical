@@ -416,6 +416,29 @@ exports.updateUser = async function(req, res) {
     }
 };
 
+exports.searchUser = async function(req, res) {
+    try {
+        var user = req.body.search;
+        await User.findOne({ username: user })
+            .exec((err, user) => {
+                if (err) throw err;
+
+                if (!user) {
+                    console.log('No user with username { ' + user + ' } were found');
+                    // retrieve url before get request to redirect user to previous context
+                    res.redirect('/');
+                } else {
+                    // implement response
+                    res.redirect('/' + user.username);
+                }
+            })
+
+    } catch (err) {
+        console.error('Could not find specified user', err);
+        // implement response
+    }
+};
+
 /*
     Facebook
     const credentials = Realm.Credentials.facebook(token)

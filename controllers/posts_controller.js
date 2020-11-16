@@ -110,4 +110,15 @@ exports.downvote = async function(req, res) {
 exports.delete = async function(req, res) {
     // retrieve post id - req.params.postId
     // query db for findOneAndDelete()
+    await Post.findOneAndDelete({ _id: req.params.postId })
+        .exec((err, post) => {
+            if (err) throw err;
+
+            if (!post) console.log('Post with id { ' + req.params.postId + ' } not found');
+            else {
+                // implement response
+                console.log('Post with id { ' + req.params.postId + ' } deleted');
+                // res.redirect('/topics/'+req.params.topicTitle+'/');
+            }
+        });
 };

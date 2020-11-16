@@ -72,9 +72,41 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 	let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
+	var followersList = new Array();
+	var followingList = new Array();
 
-	await User.findById(currUserId, function(err, foundUser) {
-		res.render('profile', {user: foundUser});
+	await User.findById(currUserId, async function(err, foundUser) {
+		// get followers, query { followeeName: username }
+		await Follower.find({ followeeName: foundUser.username, isUser: true })
+			.exec((err, list) => {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followersList = list;
+					console.log('followerList length: ' + followersList.length);
+					console.log('list length: ' + list.length);
+				}
+			});
+
+		// get following, query { followerName: username }
+		await Follower.find({ followerName: foundUser.username, isUser: true })
+			.exec((err, list) => {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No following found');
+				} else {
+					console.log('Found list of following');
+					followingList = list;
+					console.log('followingList length: ' + followingList.length);
+					console.log('list length: ' + list.length);
+				}
+			});
+		
+		res.render('profile', { user: foundUser, followers: followersList, following: followingList });
 	}).catch(err => res.status(500).json({message: err.message}));
 });
 
@@ -185,6 +217,8 @@ app.post('/reset/:token', [
 ], users.resetPassword);
 
 app.post('/createPost', posts.create, topics.check);
+
+app.post('/search', users.searchUser);
 
 //settings edit routes
 app.post('/editName', users.editName);
