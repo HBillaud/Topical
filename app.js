@@ -69,12 +69,35 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/profile', users.verifyToken, async function(req, res) {
+	res.redirect('/profile/timeline');
+});
+
+app.get('/profile/timeline', async function(req, res) {
 	let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
-	var followersList = [];
-	var followingList = [];
+	
+	await User.findById(currUserId, async function(err, foundUser) {
+		// get all posts with author: user.username
+		await Post.find({ author: foundUser.username })
+			.exec((err, posts) => {
+				if (err) throw err;
 
+				if (!posts) {
+					console.log('No posts found');
+				} else {
+					console.log('User posts found');
+					res.render('timeline', {user: foundUser, timeline: posts});
+				}
+			});
+	});
+});
+
+app.get('/profile/followers', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
 	await User.findById(currUserId, async function(err, foundUser) {
 		// get followers, query { followeeName: username }
 		await Follower.find({ followeeName: foundUser.username })
@@ -87,8 +110,17 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 					console.log('Found list of followers');
 					followersList = list;
 				}
+				res.render('followers', {user: foundUser, followers: list});
 			});
+	});
+});
 
+app.get('/profile/following', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	await User.findById(currUserId, async function(err, foundUser) {
 		// get following, query { followerName: username }
 		await Follower.find({ followerName: foundUser.username })
 			.exec((err, list) => {
@@ -100,10 +132,19 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 					console.log('Found list of following');
 					followingList = list;
 				}
-				res.render('profile', { user: foundUser, followers: followersList, following: followingList });
+				res.render('following', { user: foundUser, following: list });
 			});
-		
-	}).catch(err => res.status(500).json({message: err.message}));
+	});
+});
+
+app.get('/profile/savedPosts', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	await User.findById(currUserId, async function(err, foundUser) {
+		// query all posts that are in "saved" array
+	});
 });
 
 app.get('/confirmEmail', users.confirmEmail, function(req, res) {
