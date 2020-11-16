@@ -49,6 +49,19 @@
         <% } %>
     </div>
 
+    <!-- List follow/unfollow button  -->    
+    <div  style="width: 50%; margin: auto; margin-top: 30px; text-align: center;">
+        <% if(!isFollowing){ %>
+            <form>
+            <button type="submit" formmethod="POST" formaction="follow" class="btn btn-primary">Follow</button>
+            </form>
+        <% } else{ %>  
+            <form>
+                <button type="submit" formmethod="POST" formaction="unfollow" class="btn btn-primary">Unfollow</button>
+            </form>
+        <% } %>
+    </div>
+    
     <!-- Display posts associated with a topics when that topic is currently selected -->
     <% for(var i=0; i < posts.length; i++) { %>
         <div class="card border-dark" style="width: 50%; margin: auto; margin-top: 30px; text-align: center;">

@@ -117,7 +117,6 @@ app.get('/confirmEmail', users.confirmEmail, function(req, res) {
 app.get('/topics', users.verifyToken, async function(req, res) {
 	// query all existing topics from DB
 	// send result to frontend to display
-
     await Topic.find({ })
         .exec((err, result) => {
             if (err) { 
@@ -137,6 +136,43 @@ app.get('/topics/:topicTitle/', async function(req, res) {
 	// retrieve topic selected by user - req.params.topicId
     // query all posts with that specific topic
 	// send array of posts to frontend to display 
+
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = (decoded.id);
+
+	var currentUsername;
+	//find current user in table
+	await User.findById(currUserId, function(err, user) {
+		if (err) {
+			console.log("User not found");
+			res.redirect("/");
+		}
+
+		if (user) currentUsername = (user.username);
+	});
+	if (currentUsername == undefined) {
+		res.redirect("/topics/" + req.params.topicTitle + "/")
+	}
+	else {
+	var isFollow;
+	await Follower.findOne({
+		$and: [
+			{
+				followeeName: req.params.topicTitle
+			},
+			{
+				followerName: currentUsername
+			}
+		]},
+		function(err, result) {
+			if (err) console.log("Follower not found");
+
+			if (result) isFollow = true;
+			else isFollow = false;
+			
+		});
+	
 	await Post.find({ topic: req.params.topicTitle })
         .exec((err, posts) => {
             if (err)  throw err;
@@ -144,15 +180,18 @@ app.get('/topics/:topicTitle/', async function(req, res) {
             else {
 				Topic.find({ })
 					.exec((err, result) => {
-						res.render('topicsFetch', {topics: result, posts: posts});
+						res.render('topicsFetch', {topics: result, posts: posts, isFollowing: isFollow});
 					});
             }
-        });
+		});
+	}
 });
 
 app.get('/settings', users.verifyToken, function(req, res) {
 	res.render('settings');
 });
+app.post('/topics/:topicTitle/follow', follows.handleTopicFollow);
+app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
 
 app.post('/topics/:topicTitle/:postId/upvote', posts.upvote);
 app.post('/topics/:topicTitle/:postId/downvote', posts.downvote);
@@ -194,28 +233,28 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = (decoded.id);
 
-	var otherUserId;
+	var currentUsername;
 
-	//find user in table
-	await User.findOne({username: req.params.username}, function(err, user) {
+	//find current user in table
+	await User.findById(currUserId, function(err, user) {
 		if (err) {
 			console.log("User not found");
 			res.redirect("/");
 		}
 
-		if (user) otherUserId = (user.id);
+		if (user) currentUsername = (user.username);
 	});
 
-	if (otherUserId != undefined) {
+	if (currentUsername != undefined) {
 		//check if logged in user is following this user
 		var isFollow;
 		await Follower.findOne({
 			$and: [
 				{
-					followeeId: otherUserId
+					followeeName: req.params.username
 				},
 				{
-					followerId: currUserId
+					followerName: currentUsername
 				}
 			]},
 			function(err, result) {
@@ -225,27 +264,27 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 				else isFollow = false;
 				
 			});
-
-		await User.findById(otherUserId, function(err, foundUser) {		
+		//create user payload for ejs file
+		await User.findOne({username: req.params.username}, function(err, foundUser) {		
 			if(err || foundUser == null) {
 				//req.flash("error", "Something went wrong.");
 				return res.redirect("/");
 			}
 
-			if (currUserId == otherUserId) {
+			if (currentUsername == req.params.username) {
 				res.render('profile', {user: foundUser});
 			}
 			else {
-				res.render('user', {user: foundUser, isFollowing: isFollow });
+				res.render('user', {user: foundUser, isFollowing: isFollow});
 			}
 		});
 	}
-	else { //query failed for otherUserId
+	else { //query failed for currentUsername
 		res.redirect("/" + req.params.username)
 	}
 
 });
-app.post('/:username', follows.handleFollow);
+app.post('/:username', follows.handleUserFollow);
 
 
 app.listen(port, function() {
