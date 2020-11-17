@@ -224,9 +224,17 @@ app.get('/topics/:topicTitle/', async function(req, res) {
 	}
 });
 
-app.get('/settings', users.verifyToken, function(req, res) {
-	res.render('settings');
+app.get('/settings', users.verifyToken, async function(req, res) {
+	// retrieve user info
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
+	await User.findById(currUserId, async function(err, foundUser) {
+		res.render('settings', {user: foundUser});
+	});
 });
+
 app.post('/topics/:topicTitle/follow', follows.handleTopicFollow);
 app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
 
@@ -237,7 +245,6 @@ app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
-app.post('/settings', users.updateUser);
 
 // password reset routes
 app.get('/forgotPassword',  function(req, res) {
@@ -257,10 +264,7 @@ app.post('/createPost', posts.create, topics.check);
 
 app.post('/search', users.searchUser);
 
-//settings edit routes
-app.post('/editName', users.editName);
-app.post('/editBio', users.editBio);
-app.post('/editPicture', users.editPicture);
+app.post('/editProfile', users.editProfile);
 
 
 app.get('/:username', users.verifyToken, async function(req, res) {
