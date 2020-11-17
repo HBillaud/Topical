@@ -69,12 +69,35 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/profile', users.verifyToken, async function(req, res) {
+	res.redirect('/profile/timeline');
+});
+
+app.get('/profile/timeline', async function(req, res) {
 	let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
-	var followersList = [];
-	var followingList = [];
+	
+	await User.findById(currUserId, async function(err, foundUser) {
+		// get all posts with author: user.username
+		await Post.find({ author: foundUser.username })
+			.exec((err, posts) => {
+				if (err) throw err;
 
+				if (!posts) {
+					console.log('No posts found');
+				} else {
+					console.log('User posts found');
+					res.render('timeline', {user: foundUser, timeline: posts});
+				}
+			});
+	});
+});
+
+app.get('/profile/followers', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
 	await User.findById(currUserId, async function(err, foundUser) {
 		// get followers, query { followeeName: username }
 		await Follower.find({ followeeName: foundUser.username })
@@ -87,8 +110,17 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 					console.log('Found list of followers');
 					followersList = list;
 				}
+				res.render('followers', {user: foundUser, followers: list});
 			});
+	});
+});
 
+app.get('/profile/following', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	await User.findById(currUserId, async function(err, foundUser) {
 		// get following, query { followerName: username }
 		await Follower.find({ followerName: foundUser.username })
 			.exec((err, list) => {
@@ -100,10 +132,19 @@ app.get('/profile', users.verifyToken, async function(req, res) {
 					console.log('Found list of following');
 					followingList = list;
 				}
-				res.render('profile', { user: foundUser, followers: followersList, following: followingList });
+				res.render('following', { user: foundUser, following: list });
 			});
-		
-	}).catch(err => res.status(500).json({message: err.message}));
+	});
+});
+
+app.get('/profile/savedPosts', async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	await User.findById(currUserId, async function(err, foundUser) {
+		// query all posts that are in "saved" array
+	});
 });
 
 app.get('/confirmEmail', users.confirmEmail, function(req, res) {
@@ -183,9 +224,17 @@ app.get('/topics/:topicTitle/', async function(req, res) {
 	}
 });
 
-app.get('/settings', users.verifyToken, function(req, res) {
-	res.render('settings');
+app.get('/settings', users.verifyToken, async function(req, res) {
+	// retrieve user info
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
+	await User.findById(currUserId, async function(err, foundUser) {
+		res.render('settings', {user: foundUser});
+	});
 });
+
 app.post('/topics/:topicTitle/follow', follows.handleTopicFollow);
 app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
 
@@ -196,7 +245,6 @@ app.post('/signup', users.signup);
 app.post('/login', users.login);
 app.post('/logout', users.logout);
 app.post('/delete', users.delete);
-app.post('/settings', users.updateUser);
 
 // password reset routes
 app.get('/forgotPassword',  function(req, res) {
@@ -216,10 +264,7 @@ app.post('/createPost', posts.create, topics.check);
 
 app.post('/search', users.searchUser);
 
-//settings edit routes
-app.post('/editName', users.editName);
-app.post('/editBio', users.editBio);
-app.post('/editPicture', users.editPicture);
+app.post('/editProfile', users.editProfile);
 
 
 app.get('/:username', users.verifyToken, async function(req, res) {
@@ -268,7 +313,7 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 			}
 
 			if (currentUsername == req.params.username) {
-				res.render('profile', {user: foundUser});
+				res.redirect('/profile');
 			}
 			else {
 				res.render('user', {user: foundUser, isFollowing: isFollow});

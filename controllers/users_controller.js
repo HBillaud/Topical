@@ -333,14 +333,13 @@ exports.getUser = async function(req, res) {
     }
 };
 
-exports.editName = async function(req,res) {
+exports.editProfile = async function(req, res) {
     let token = req.cookies["x-access-token"];
 	const decoded = jwt.verify(token, "topical-123456789");  
     var userId = decoded.id;
-    var newName = req.body.NameChange;
 
     const query = {"_id": {$eq: userId}};
-    const update = {$set : { "name": newName}}
+    const update = {$set : { "bio": req.body.BioChange, "picture": req.body.PictureURL, "name": req.body.NameChange }};
     const options = { "upsert": false };
 
     try {
@@ -351,50 +350,7 @@ exports.editName = async function(req,res) {
         console.log("ERROR: update to user failed");
     }
     res.redirect('settings'); //, {user: foundUser});   
-}
-
-//Practically identical to editname, can be combined into the same function
-
-exports.editBio = async function(req,res) {
-    let token = req.cookies["x-access-token"];
-	const decoded = jwt.verify(token, "topical-123456789");  
-    var userId = decoded.id;
-    var newBio = req.body.BioChange;
-
-    const query = {"_id": {$eq: userId}};
-    const update = {$set : { "bio": newBio}}
-    const options = { "upsert": false };
-
-    try {
-        await User.updateOne(query, update, options).then(() => {
-            console.log("Successfully updated");
-        });
-    } catch {
-        console.log("ERROR: update to user failed");
-    }
-    res.redirect('settings'); //, {user: foundUser});   
-}
-
-exports.editPicture = async function(req,res) {
-    let token = req.cookies["x-access-token"];
-	const decoded = jwt.verify(token, "topical-123456789");  
-    var userId = decoded.id;
-    var newPic = req.body.PictureURL;
-
-
-    const query = {"_id": {$eq: userId}};
-    const update = {$set : { "picture": newPic}}
-    const options = { "upsert": false };
-
-    try {
-        await User.updateOne(query, update, options).then(() => {
-            console.log("Successfully updated");
-        });
-    } catch {
-        console.log("ERROR: update to user failed");
-    }
-    res.redirect('settings'); //, {user: foundUser});   
-}
+};
 
 exports.forgotPassword = async function(req, res) {
     try {
@@ -404,15 +360,6 @@ exports.forgotPassword = async function(req, res) {
         res.redirect('/login');
     } catch (err) {
         console.error('Could not send password reset email', err);
-    }
-};
-
-exports.updateUser = async function(req, res) {
-    try {
-        
-    } catch (err) {
-        console.error('Could not update user data', err);
-        res.redirect('/');
     }
 };
 

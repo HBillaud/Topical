@@ -1,0 +1,15 @@
+<%- include('partials/header.ejs') %>
+<%- include('partials/navbar.ejs') %>
+<%- include('partials/profile.ejs') %>
+
+<script>
+    document.getElementById("followingTab").className += " active";
+</script>
+
+<div class="list-group" style="width: 20%; margin: auto; margin-top: 30px; text-align: center;">
+    <% for(var i = 0; i < following.length; i++) {  %>
+        <a href="/<%= following[i].followeeName %>" class="list-group-item list-group-item-action"><%= following[i].followeeName %></a>
+    <% } %>
+</div>
+
+<%- include('partials/footer.ejs') %>
