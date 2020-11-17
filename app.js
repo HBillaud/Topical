@@ -313,7 +313,7 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 			}
 
 			if (currentUsername == req.params.username) {
-				res.render('profile', {user: foundUser});
+				res.redirect('/profile');
 			}
 			else {
 				res.render('user', {user: foundUser, isFollowing: isFollow});
