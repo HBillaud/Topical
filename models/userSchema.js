@@ -31,6 +31,41 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [false, 'Picture is not required']
   },
+  savedPosts: [{
+      type: Object,      
+      post: {
+        _id: {
+          type: mongoose.Types.ObjectId
+        },
+        title: {
+          type: String
+        },
+        topic: {
+          type: String
+        },
+        description: {
+          type: String,
+          required: true
+        },
+        img: {
+          type: String
+        },
+        author: {
+          type: String,
+          required: true
+        },
+        anonymous: {
+          type: Boolean
+        },
+        score: {
+          type: Number
+        },
+        created: {
+          type: Date,
+          required: [true, 'Created date is required']
+        }
+      }
+  }],
   created: {
     type: Date,
     required: [true, 'Created date is required']

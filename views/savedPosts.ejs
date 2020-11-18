@@ -6,4 +6,39 @@
     document.getElementById("savedPostsTab").className += " active";
 </script>
 
+<% for(var i=0; i < posts.length; i++) { %>
+    <div class="card border-dark" style="width: 43.5%; margin: auto; margin-top: 30px; text-align: center;">
+        <div class="card-body text-dark">
+            <h5 class="card-title"><%= posts[i].title %></h5>
+            <p class="card-text"><%= posts[i].description %></p>
+            <div class="row">
+                <div class="col"> <!-- Modify formaction -->
+                    <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/upvote">
+                        <img src="/like.png" width="30px" height="30px">
+                    </button></form>
+                </div>
+                <div class="col">
+                    <p class="card-text">Score: <%= posts[i].score %></p>
+                </div>
+                <div class="col"> <!-- Modify formaction -->
+                    <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/downvote">
+                        <img src="/dislike.png" width="30px" height="30px">
+                    </button></form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer border-dark">
+            <!-- Like and dislike buttons -->
+            <% if (posts[i].anonymous == true) { %>
+            <small class="text-muted">Posted by Anonymous</small>
+            <% } else { %>
+                <small class="text-muted">Posted by</small>
+                <a href="/<%= posts[i].author %>">
+                    <%= posts[i].author %>
+                </a> <% } %>
+            <small class="text-muted">on <%= posts[i].created %></small>
+        </div>
+    </div>
+<% } %>
+
 <%- include('partials/footer.ejs') %>

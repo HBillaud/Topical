@@ -144,6 +144,9 @@ app.get('/profile/savedPosts', async function(req, res) {
 
 	await User.findById(currUserId, async function(err, foundUser) {
 		// query all posts that are in "saved" array
+		if (err) throw err;
+
+		res.render('savedPosts', { user: foundUser, posts: foundUser.savedPosts });
 	});
 });
 
@@ -240,6 +243,7 @@ app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
 
 app.post('/topics/:topicTitle/:postId/upvote', posts.upvote);
 app.post('/topics/:topicTitle/:postId/downvote', posts.downvote);
+app.post('/topics/:topicTitle/:postId/save', posts.save);
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);

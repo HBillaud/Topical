@@ -5,6 +5,7 @@ const config = require("../config/auth.config");
 
 const Post = require('../models/postSchema');
 const User = require('../models/userSchema');
+const { update } = require('../models/postSchema');
 
 exports.create = async function(req, res, next) {
     try {
@@ -91,7 +92,7 @@ exports.downvote = async function(req, res) {
             if (!post) console.log('Post with id { ' + req.params.postId + ' } not found');
             else {
                 var decrement = post.score - 1;
-                var update = { score: decrement}
+                var update = { score: decrement};
                 Post.findOneAndUpdate({ _id : req.params.postId }, update)
                     .exec((err, result) => {
                         if (err) throw err;
@@ -119,6 +120,38 @@ exports.delete = async function(req, res) {
                 // implement response
                 console.log('Post with id { ' + req.params.postId + ' } deleted');
                 // res.redirect('/topics/'+req.params.topicTitle+'/');
+            }
+        });
+};
+
+exports.save = async function(req, res) {
+    // retrieve post id - req.params.postId
+    // query db for user with findOnebyId
+    // push post to array of saved post
+    let token = req.cookies["x-access-token"];
+    const decoded = jwt.verify(token, "topical-123456789");  
+    var userId = decoded.id;
+
+    var savePost;
+    await Post.findOne({ _id: req.params.postId })
+        .exec((err, post) => {
+            if (err) throw err;
+
+            if (!post) console.log('post no longer exists');
+            else {
+                console.log('post' + JSON.stringify(post));
+                savePost = JSON.stringify(post);
+                var update = { $push: { savedPosts: post }};
+                User.findByIdAndUpdate({ _id: userId }, update)
+                    .exec((err, result) =>  {
+                        if (err) throw err;
+
+                        if (!result) console.log('Could not save post');
+                        else {
+                            // implement response
+                            res.redirect('/topics/'+req.params.topicTitle+'/');
+                        }
+                    })
             }
         });
 };
