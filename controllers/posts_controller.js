@@ -132,15 +132,12 @@ exports.save = async function(req, res) {
     const decoded = jwt.verify(token, "topical-123456789");  
     var userId = decoded.id;
 
-    var savePost;
     await Post.findOne({ _id: req.params.postId })
         .exec((err, post) => {
             if (err) throw err;
 
             if (!post) console.log('post no longer exists');
             else {
-                console.log('post' + JSON.stringify(post));
-                savePost = JSON.stringify(post);
                 var update = { $push: { savedPosts: post }};
                 User.findByIdAndUpdate({ _id: userId }, update)
                     .exec((err, result) =>  {

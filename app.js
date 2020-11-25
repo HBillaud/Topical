@@ -77,8 +77,34 @@ app.get('/profile/timeline', async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
 	
+	var followerCount, followingCount;
 	await User.findById(currUserId, async function(err, foundUser) {
 		// get all posts with author: user.username
+		// retrieve follower/following counts
+		await Follower.find({ followeeName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followerCount = list.length;
+				}
+			});
+
+		await Follower.find({ followerName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followingCount = list.length;
+				}
+			});
+
 		await Post.find({ author: foundUser.username })
 			.exec((err, posts) => {
 				if (err) throw err;
@@ -87,7 +113,7 @@ app.get('/profile/timeline', async function(req, res) {
 					console.log('No posts found');
 				} else {
 					console.log('User posts found');
-					res.render('timeline', {user: foundUser, timeline: posts});
+					res.render('timeline', {user: foundUser, timeline: posts, followerCount: followerCount, followingCount: followingCount});
 				}
 			});
 	});
@@ -98,8 +124,21 @@ app.get('/profile/followers', async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
 	
+	var followerCount, followingCount;
 	await User.findById(currUserId, async function(err, foundUser) {
 		// get followers, query { followeeName: username }
+		await Follower.find({ followerName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followingCount = list.length;
+				}
+			});
+
 		await Follower.find({ followeeName: foundUser.username })
 			.exec((err, list) =>  {
 				if (err) throw err;
@@ -108,9 +147,9 @@ app.get('/profile/followers', async function(req, res) {
 					console.log('No followers found');
 				} else {
 					console.log('Found list of followers');
-					followersList = list;
+					followerCount = list.length;
 				}
-				res.render('followers', {user: foundUser, followers: list});
+				res.render('followers', {user: foundUser, followers: list, followerCount: followerCount, followingCount: followingCount});
 			});
 	});
 });
@@ -120,8 +159,23 @@ app.get('/profile/following', async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
 
+	var followingCount, followerCount;
 	await User.findById(currUserId, async function(err, foundUser) {
 		// get following, query { followerName: username }
+		if (err) throw err;
+
+		await Follower.find({ followeeName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followerCount = list.length;
+				}
+			});
+			
 		await Follower.find({ followerName: foundUser.username })
 			.exec((err, list) => {
 				if (err) throw err;
@@ -130,9 +184,9 @@ app.get('/profile/following', async function(req, res) {
 					console.log('No following found');
 				} else {
 					console.log('Found list of following');
-					followingList = list;
+					followingCount = list.length;
 				}
-				res.render('following', { user: foundUser, following: list });
+				res.render('following', { user: foundUser, following: list, followerCount: followerCount, followingCount: followingCount });
 			});
 	});
 });
@@ -142,11 +196,35 @@ app.get('/profile/savedPosts', async function(req, res) {
 	const decoded = jwt.verify(token, "topical-123456789");  
 	var currUserId = decoded.id;
 
+	var followerCount, followingCount;
 	await User.findById(currUserId, async function(err, foundUser) {
 		// query all posts that are in "saved" array
 		if (err) throw err;
 
-		res.render('savedPosts', { user: foundUser, posts: foundUser.savedPosts });
+		await Follower.find({ followeeName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followerCount = list.length;
+				}
+			});
+
+		await Follower.find({ followerName: foundUser.username })
+			.exec((err, list) =>  {
+				if (err) throw err;
+
+				if (!list) {
+					console.log('No followers found');
+				} else {
+					console.log('Found list of followers');
+					followingCount = list.length;
+				}
+				res.render('savedPosts', { user: foundUser, posts: foundUser.savedPosts, followingCount: followingCount, followerCount: followerCount });
+			});
 	});
 });
 
