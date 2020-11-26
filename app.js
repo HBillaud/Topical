@@ -322,6 +322,7 @@ app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
 app.post('/topics/:topicTitle/:postId/upvote', posts.upvote);
 app.post('/topics/:topicTitle/:postId/downvote', posts.downvote);
 app.post('/topics/:topicTitle/:postId/save', posts.save);
+app.post('/topics/:topicTitle/:postId/comment', posts.comment);
 
 app.post('/signup', users.signup);
 app.post('/login', users.login);

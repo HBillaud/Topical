@@ -30,12 +30,6 @@ exports.create = async function(req, res, next) {
                         title: req.body.title,
                         topic: req.body.topic,
                         description: req.body.description,
-                        /*
-                        img: { 
-                            data: fs.readFileSync(req.file.path),
-                            contentType: 'image/png'
-                        },
-                        */
                         img: req.body.imgURL,
                         author: name,
                         anonymous: anonymous,
@@ -151,4 +145,37 @@ exports.save = async function(req, res) {
                     })
             }
         });
+};
+
+exports.comment = async function(req, res) {
+    // retrieve user's username
+    // retrieve post id - req.params.postId
+    // query db to add comment to array of comments under appropriate post
+    let token = req.cookies["x-access-token"];
+    const decoded = jwt.verify(token, "topical-123456789");  
+    var userId = decoded.id;
+    
+    await User.findById({ _id: userId })
+        .exec((err, user) => {
+            if (err) throw err;
+            var author = user.username;
+            console.log(`Comment is ${req.body.comment} and the author is ${author}`);
+            var comment = `{"text":"${req.body.comment}", "author":"${author}"}`;
+            var jsoncomment = JSON.parse(comment);
+            var update = { $push: { comments: jsoncomment }};
+
+            Post.findByIdAndUpdate({ _id: req.params.postId }, update)
+                .exec((err, post) => {
+                    if (err) throw err;
+
+                    if (!post) console.log('Could not create comment under post with id { ' + req.body.postId + ' }');
+                    else {
+                        // implement response
+                        console.log('Comment successfully created!');
+                        res.redirect('/topics/'+req.params.topicTitle+'/');
+                    }
+                });
+        });
+    
+    console.log(`The comment is ${req.body.comment} and the author is ${author}`);
 };

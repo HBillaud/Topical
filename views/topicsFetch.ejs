@@ -34,7 +34,7 @@
                 <h5 class="card-title"><%= posts[i].title %></h5>
                 <p class="card-text"><%= posts[i].description %></p>
                 <div class="row">
-                    <div class="col"> <!-- Modify formaction -->
+                    <div class="col"> <!-- like button -->
                         <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/upvote">
                             <img src="/like.png" width="30px" height="30px">
                         </button></form>
@@ -42,7 +42,7 @@
                     <div class="col">
                         <p class="card-text">Score: <%= posts[i].score %></p>
                     </div>
-                    <div class="col"> <!-- Modify formaction -->
+                    <div class="col"> <!-- dislike button -->
                         <form><button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/downvote">
                             <img src="/dislike.png" width="30px" height="30px">
                         </button></form>
@@ -51,9 +51,25 @@
                 <form>
                     <button type="submit" formmethod="POST" formaction="<%= posts[i]._id %>/save" class="btn btn-outline-dark my-2 my-sm-0">Save</button>
                 </form>
+                <!-- display comments under each posts -->
+                <% if(posts[i].comments.length > 0) { %>
+                    <p style="text-align: left; font-style: italic;">Comments (<%= posts[i].comments.length %>)</p>
+                <% } %>    
+                <% for(var a=0; a < posts[i].comments.length; a++) { %>
+                        <p><%= posts[i].comments[a].text %>
+                            <br>
+                            <small class="text-muted">posted by </small>
+                            <a href="/<%= posts[i].comments[a].author %>"><%= posts[i].comments[a].author %></a>
+                        </p>
+                <% } %>
+                <form>
+                    <div class="form-group">
+                        <input class="form-control" name="comment" type="text" placeholder="Your comment" />
+                        <button type="submit" formaction="<%= posts[i]._id %>/comment" formmethod="POST" class="btn btn-outline-dark my-2 my-sm-0">Add comment</button>
+                    </div>
+                </form>
             </div>
             <div class="card-footer border-dark">
-                <!-- Like and dislike buttons -->
                 <% if (posts[i].anonymous == true) { %>
                 <small class="text-muted">Posted by Anonymous</small>
                 <% } else { %>

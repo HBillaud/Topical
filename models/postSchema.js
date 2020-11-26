@@ -11,12 +11,6 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  /*
-  img: {
-    data: Buffer,
-    contentType: String
-  },
-  */
  img: {
     type: String
   },
@@ -30,6 +24,19 @@ const postSchema = new mongoose.Schema({
   score: {
     type: Number
   },
+  comments: [{
+    type: Object,
+    comment: {
+      text: {
+        type: String,
+        required: true
+      },
+      author: {
+        type: String,
+        required: true
+      }
+    }
+  }],
   created: {
     type: Date,
     required: [true, 'Created date is required']
