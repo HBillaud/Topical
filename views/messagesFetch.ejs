@@ -1,0 +1,44 @@
+
+    <%- include('partials/header.ejs') %>
+    <script src=”/socket.io/socket.io.js”></script>
+
+    <%- include('partials/navbar.ejs') %>
+    <script>
+        document.getElementById("messagesNav").className += " active";
+    </script>
+
+    <div>
+        <h3>Messages with <%= receiver %></h3><br>
+    </div>
+
+    <div id="messages">
+        <% for(var i=0; i < messages.length; i++) { %>
+            <p><%= messages[i].sender %>: <%= messages[i].msg %></p>
+        <% } %>
+    </div>
+
+    <form method="POST">
+        <!-- Text input -->
+        <div class="form-group">
+            <input type="text" class="form-control" name="msg" placeholder="Your Message" required>
+        </div>
+        <button type="submit" name="submit" value="<%= user.username %>" class="btn btn-outline-primary">Respond</button>
+    </form>
+
+    <!-- link back to inbox   -->
+    <div class="list-group list-group-horizontal" style="margin-top: 10px; margin-left: 10px;">
+        <a href="/messages" class="btn btn-light list-group-item">Return to inbox</a>
+    </div>  
+   
+    <script>
+        var socket = io();
+        
+        socket.on('message', addMessages)
+
+        function addMessages(message){
+            $("#messages").append(`<p> ${message.sender}: ${message.msg} </p>`)
+        }
+
+    </script>
+
+    <%- include('partials/footer.ejs') %>
