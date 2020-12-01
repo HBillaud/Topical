@@ -4,12 +4,14 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const {check} = require('express-validator');
-
+var io = require('socket.io')(http);
 
 const jwt = require('jsonwebtoken');
 //const config = require("../config/auth.config");
 
-
+io.on('connection', () =>{
+	console.log('a user is connected');
+})
 
 var app = express();
 
@@ -18,6 +20,8 @@ var users = require('./controllers/users_controller');
 var posts = require('./controllers/posts_controller');
 var topics = require('./controllers/topics_controller');
 var follows = require('./controllers/follows_controller');
+var message = require('./controllers/message_controller');
+var block = require('./controllers/block_controller');
 
 const { ppid } = require('process');
 
@@ -26,7 +30,8 @@ const User = require('./models/userSchema');
 const Post = require('./models/postSchema');
 const Topic = require('./models/topicSchema');
 const Follower = require('./models/followerSchema');
-
+const Message = require('./models/messageSchema');
+const Block = require('./models/blockSchema');
 
 const ATLAS_URI = "mongodb+srv://HBillaud:Floride09@cluster.oye5v.mongodb.net/usersdb?retryWrites=true&w=majority";
 
@@ -312,9 +317,76 @@ app.get('/settings', users.verifyToken, async function(req, res) {
 	var currUserId = decoded.id;
 	
 	await User.findById(currUserId, async function(err, foundUser) {
-		res.render('settings', {user: foundUser});
+		if (err) throw err;
+		else res.render('settings', {user: foundUser});
 	});
 });
+
+app.get('/messages', users.verifyToken, async function(req, res) {
+	// retrieve user info
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+
+	//find current user in table
+	await User.findById(currUserId, function(err, user) {
+		if (err) {
+			console.log("User not found");
+			res.redirect("/");
+		}
+
+		if (user) {
+			res.render('messages', {user: user})		
+	    }
+    });
+});
+
+app.get('/messages/:username/', users.verifyToken, async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
+	var rcvr = req.params.username;
+	var currentUsername;
+
+	//find current user in table
+	await User.findById(currUserId, function(err, user) {
+		if (err) {
+			console.log("User not found");
+			res.redirect("/");
+		}
+
+		if (user) {
+			currentUsername = (user.username);
+			console.log("sent between: "+currentUsername+", "+rcvr);
+
+			Message.find({$or: [{
+						sender: currentUsername, 
+						receiver : rcvr
+					}, 
+					{
+						sender: rcvr, 
+						receiver : currentUsername
+					}]
+				}).sort( { _id: 1 } ).exec((err, messages) => {
+					if (err) throw err;
+				    else {
+						console.log("Retreived " + messages.length + " messages");
+						
+						res.render('messagesFetch', {
+							user: user, 
+							receiver: rcvr, 
+							messages: messages});
+					}
+				});
+		}
+	});
+	
+})
+
+app.post('/createMessage', message.create);
+
+app.post('/messages/:username/', message.respond);
 
 app.post('/topics/:topicTitle/follow', follows.handleTopicFollow);
 app.post('/topics/:topicTitle/unfollow', follows.handleTopicUnfollow);
@@ -349,6 +421,10 @@ app.post('/search', users.searchUser);
 
 app.post('/editProfile', users.editProfile);
 
+app.post('/block', block.handleBlock);
+
+app.post('/unblock', block.handleUnblock);
+
 
 app.get('/:username', users.verifyToken, async function(req, res) {
 	// get selected user's profile
@@ -370,8 +446,14 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 	});
 
 	if (currentUsername != undefined) {
+			
+		if (currentUsername == req.params.username) {
+			res.redirect('/profile');
+		}
 		//check if logged in user is following this user
 		var isFollow;
+		var blocked;
+
 		await Follower.findOne({
 			$and: [
 				{
@@ -388,28 +470,44 @@ app.get('/:username', users.verifyToken, async function(req, res) {
 				else isFollow = false;
 				
 			});
-		//create user payload for ejs file
-		await User.findOne({username: req.params.username}, function(err, foundUser) {		
-			if(err || foundUser == null) {
-				//req.flash("error", "Something went wrong.");
-				return res.redirect("/");
-			}
 
-			if (currentUsername == req.params.username) {
-				res.redirect('/profile');
+		await Block.find({$or: [{
+				blocker: currentUsername, 
+				blockee : req.params.username
+			}, 
+			{
+				blocker: req.params.username, 
+				blockee : currentUsername
+			}]
+		}).exec((err, result) => {
+			if (err) {
+				console.log(err);
+				res.redirect("/");
 			}
 			else {
-				res.render('user', {user: foundUser, isFollowing: isFollow});
+				if (result && result != "") blocked = true;
+				else blocked = false;
+
+				User.findOne({username: req.params.username}, function(err, foundUser) {
+					if (err) {
+						console.log(err);
+						res.redirect("/");
+					}
+					console.log("result:" + result);
+					console.log("isblocked2: " + blocked);
+					res.render('user', {
+						user: foundUser,
+						isFollowing: isFollow, 
+						isBlocked: blocked});
+				});
 			}
 		});
-	}
-	else { //query failed for currentUsername
-		res.redirect("/" + req.params.username)
-	}
-
+	} else res.redirect("/" + req.params.username);
 });
-app.post('/:username', follows.handleUserFollow);
 
+app.post('/handleFollow', follows.handleUserFollow);
+
+app.post('/handleUnfollow', follows.handleUserUnfollow);
 
 app.listen(port, function() {
     console.log('Our app is running on http://localhost:' + port);

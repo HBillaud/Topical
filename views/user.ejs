@@ -11,22 +11,38 @@
             <h2><%= user.username %></h2> 
             <h2><%= user.email %></h2><br>
 
-            
+            <% if(!isBlocked){ %>
                 <% if(!isFollowing){ %>
-                    <form method="POST" style="margin-top: 30px">
+                    <form method="POST" action="/handleFollow" style="margin-top: 30px">
                         <div class="form-group" style="margin: auto;">
-                            <button type="submit" name="press" value="followUser" class="btn btn-primary">Follow</button>
+                            <button type="submit" name="onpress" value="<%= user.username %>" class="btn btn-primary">Follow</button>
+                        </div>
+                    </form>
+                    <form method="POST" action="/block" style="margin-top: 30px">
+                        <div class="form-group" style="margin: auto;">
+                            <button type="submit" name="onpress" value="<%= user.username %>" class="btn btn-primary">Block</button>
                         </div>
                     </form>
                 <% } else{ %>  
-                    <form method="POST" style="margin-top: 30px">
+                    <form method="POST" action="/handleUnfollow" style="margin-top: 30px">
                         <div class="form-group" style="margin: auto;">
-                            <button type="submit" name="press" value="unfollowUser" class="btn btn-primary">Unfollow</button>
+                            <button type="submit" name="onpress" value="<%= user.username %>" class="btn btn-primary">Unfollow</button>
+                        </div>
+                    </form>
+                    <form method="POST" action="/block" style="margin-top: 30px">
+                        <div class="form-group" style="margin: auto;">
+                            <button type="submit" name="onpress" value="<%= user.username %>" class="btn btn-primary">Block</button>
                         </div>
                     </form>
                 <% } %>
-            
-            </form>
+            <% } else{ %>  
+                <form method="POST" action="/unblock" style="margin-top: 30px">
+                    <div class="form-group" style="margin: auto;">
+                        <button type="submit" name="onpress" value="<%= user.username %>" class="btn btn-primary">Unblock</button>
+                    </div>
+                </form>
+            <% } %>
+
 
             <div class="thumbnail">
                 <img src="<%= user.picture %>" width="300" height="300"> 

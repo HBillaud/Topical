@@ -18,7 +18,7 @@ exports.handleUserFollow = async function(req,res) {
     var currUserId = (decoded.id).toString();
     
     //check if it is a follow or unfollow request
-    var check = req.body.press;
+    var followeeName = req.body.onpress;
 
     var currentUsername;
 
@@ -35,44 +35,74 @@ exports.handleUserFollow = async function(req,res) {
 
     var query = {$and: [
         {
-            followeeName: req.params.username
+            followeeName: followeeName
+        },
+        {
+            followerName: currentUsername
+        }
+    ]};
+    
+    //add follower
+    var follower;
+    await Follower.findOne(query, function(err, result) {
+        if (err){ 
+            console.log(err);
+        } 
+
+        if ((!result) || result.id == undefined) {
+            follower = new Follower({
+                followeeName: followeeName,
+                followerName: currentUsername,
+                IsUser: true
+            }).save();
+            console.log("Created Follower Tuple")
+        }
+
+        res.redirect("/" + followeeName);
+    });
+}
+
+exports.handleUserUnfollow = async function(req,res) {
+
+    let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+    var currUserId = (decoded.id).toString();
+    
+    //check if it is a follow or unfollow request
+    var followeeName = req.body.onpress;
+
+    var currentUsername;
+
+	//find current user in table
+	await User.findById(currUserId, function(err, user) {
+		if (err) {
+			console.log("User not found");
+			res.redirect("/");
+		}
+
+		if (user) currentUsername = (user.username);
+	});
+    
+
+    var query = {$and: [
+        {
+            followeeName: followeeName
         },
         {
             followerName: currentUsername
         }
     ]};
 
-    if (check == "unfollowUser") { //remove follower
-        await Follower.findOneAndDelete(query, function (err, docs) { 
-            if (err){ 
-                console.log(err);
-            } 
-            else if (docs) { 
-                console.log("Deleted Follower Tuple : ", docs); 
-            }
-            res.redirect("/" + req.params.username);
-        });
-    }
-    else if (check == "followUser") { //add follower
-        var follower;
-        await Follower.findOne(query, function(err, result) {
-            if (err){ 
-                console.log(err);
-            } 
-
-            if ((!result) || result.id == undefined) {
-                follower = new Follower({
-                    followeeName: req.params.username,
-                    followerName: currentUsername,
-                    IsUser: true
-                }).save();
-                console.log("Created Follower Tuple")
-            }
-
-            res.redirect("/" + req.params.username);
-        });
-
-    }
+    //remove follower
+    await Follower.findOneAndDelete(query, function (err, docs) { 
+        if (err){ 
+            console.log(err);
+        } 
+        else if (docs) { 
+            console.log("Deleted Follower Tuple : ", docs); 
+        }
+        res.redirect("/" + followeeName);
+    });
 }
 
 exports.handleTopicFollow = async function(req,res) {

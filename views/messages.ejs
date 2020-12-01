@@ -1,0 +1,62 @@
+
+    <%- include('partials/header.ejs') %>
+
+
+    <%- include('partials/navbar.ejs') %>
+    <script>
+        document.getElementById("messagesNav").className += " active";
+    </script>
+
+    <!-- List group of buttons to navigate to messages   -->
+    <div class="list-group list-group-horizontal" style="margin-top: 10px; margin-left: 10px;">
+        <% for(var i=0; i < user.inbox.length; i++) { %>
+            <a href="/messages/<%= user.inbox[i] %>/" class="btn btn-light list-group-item"><%= user.inbox[i] %></a>
+         <% } %>
+    </div>
+
+    <!-- message creation -->
+    <div class="card" style="width: 50%; margin: auto; margin-top: 30px; text-align: center;">
+        <div class="card-header">
+          Message
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Send Message</h5>
+          
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#createMessage">
+            Create Message
+          </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="createMessage" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="/createMessage">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Type username you are dming -->
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="receiver" placeholder="User's Name" required>
+                        </div>
+                        <!-- Text input -->
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="msg" placeholder="Your Message" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" value="submit" class="btn btn-outline-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer.ejs') %>

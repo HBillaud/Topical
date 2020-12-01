@@ -66,6 +66,9 @@ const userSchema = new mongoose.Schema({
         }
       }
   }],
+  inbox: [{
+    type: String
+  }],
   created: {
     type: Date,
     required: [true, 'Created date is required']
