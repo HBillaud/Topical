@@ -95,7 +95,7 @@ app.get('/', users.verifyToken, async function(req, res) {
 				{
 					topic: { $in: following }
 				}]
-			}).sort( { _id: 1 } ).exec((err, posts) => {
+			}).sort( { _id: -1 } ).exec((err, posts) => {
 				if (err) {
 					console.log(err);
 					res.redirect("/");
@@ -155,7 +155,7 @@ app.get('/profile/userline', async function(req, res) {
 				}
 			});
 
-		await Post.find({ author: foundUser.username })
+		await Post.find({ author: foundUser.username }).sort({_id: -1})
 			.exec((err, posts) => {
 				if (err) throw err;
 
