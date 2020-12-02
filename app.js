@@ -61,8 +61,53 @@ app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/controllers'));
 
 // set the home page route
-app.get('/', users.verifyToken, function(req, res) {
-	res.render('index');
+app.get('/', users.verifyToken, async function(req, res) {
+	let token = req.cookies["x-access-token"];
+	const decoded = jwt.verify(token, "topical-123456789");  
+	var currUserId = decoded.id;
+	
+	//TODO: return this to timeline instead of timeline2 
+	// if you want the sexy profile ejs
+	// so add your counts and other necessary fields
+	
+	var followerCount, followingCount;
+	await User.findById(currUserId, async function(err, foundUser) {
+		if (err) {
+			console.log(err);
+			res.redirect("/");
+		}
+		
+		//query who user is following
+		var results = await Follower.find(
+			{followerName: foundUser.username}
+		);
+		//populate following array with strings of their names
+		const following = [];
+		for (var i = 0; i < results.length; i++) {
+			console.log(results[i].followeeName);
+			following.push(results[i].followeeName);
+		}
+
+		//query posts that contain authors or topics in following array
+		await Post.find({$or: [{
+					author: { $in: following } 
+				},
+				{
+					topic: { $in: following }
+				}]
+			}).sort( { _id: 1 } ).exec((err, posts) => {
+				if (err) {
+					console.log(err);
+					res.redirect("/");
+				}
+				if (!posts) {
+					console.log('No posts found');
+				} else {
+					console.log('User posts found: ' + posts.length);
+					res.render('index', {user: foundUser, timeline: posts});
+				}
+			});
+	});
 });
 
 app.get('/signup', function(req, res) {
@@ -118,60 +163,10 @@ app.get('/profile/userline', async function(req, res) {
 					console.log('No posts found');
 				} else {
 					console.log('User posts found');
-					res.render('timeline', {user: foundUser, timeline: posts, followerCount: followerCount, followingCount: followingCount});
+					res.render('userline', {user: foundUser, timeline: posts, followerCount: followerCount, followingCount: followingCount});
 				}
 			});
 	});
-});
-
-app.get('/profile/timeline', async function(req, res) {
-	let token = req.cookies["x-access-token"];
-	const decoded = jwt.verify(token, "topical-123456789");  
-	var currUserId = decoded.id;
-	
-	//TODO: return this to timeline instead of timeline2 
-	// if you want the sexy profile ejs
-	// so add your counts and other necessary fields
-	
-	var followerCount, followingCount;
-	await User.findById(currUserId, async function(err, foundUser) {
-		if (err) {
-			console.log(err);
-			res.redirect("/");
-		}
-		
-		//query who user is following
-		var results = await Follower.find(
-			{followerName: foundUser.username}
-		);
-		//populate following array with strings of their names
-		const following = [];
-		for (var i = 0; i < results.length; i++) {
-			console.log(results[i].followeeName);
-			following.push(results[i].followeeName);
-		}
-
-		//query posts that contain authors or topics in following array
-		await Post.find({$or: [{
-					author: { $in: following } 
-				},
-				{
-					topic: { $in: following }
-				}]
-			}).sort( { _id: 1 } ).exec((err, posts) => {
-				if (err) {
-					console.log(err);
-					res.redirect("/");
-				}
-				if (!posts) {
-					console.log('No posts found');
-				} else {
-					console.log('User posts found: ' + posts.length);
-					res.render('timeline2', {user: foundUser, timeline: posts});
-				}
-			});
-	});	
-
 });
 
 app.get('/profile/followers', async function(req, res) {
