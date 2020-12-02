@@ -1,0 +1,46 @@
+<%- include('partials/header.ejs') %>
+<%- include('partials/navbar.ejs') %>
+
+
+<script>
+    document.getElementById("timelineTab").className += " active";
+</script>
+
+
+<% for(var i=0; i < timeline.length; i++) { %>
+    <div class="card border-dark" style="width: 43.5%; margin: auto; margin-top: 30px; text-align: center;">
+        <div class="card-body text-dark">
+            <h5 class="card-title"><%= timeline[i].title %></h5>
+            <p class="card-text"><%= timeline[i].description %></p>
+            <div class="row">
+                <div class="col"> <!-- Modify formaction -->
+                    <form><button type="submit" formmethod="POST" formaction="<%= timeline[i]._id %>/upvote">
+                        <img src="/like.png" width="30px" height="30px">
+                    </button></form>
+                </div>
+                <div class="col">
+                    <p class="card-text">Score: <%= timeline[i].score %></p>
+                </div>
+                <div class="col"> <!-- Modify formaction -->
+                    <form><button type="submit" formmethod="POST" formaction="<%= timeline[i]._id %>/downvote">
+                        <img src="/dislike.png" width="30px" height="30px">
+                    </button></form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer border-dark">
+            <!-- Like and dislike buttons -->
+            <% if (timeline[i].anonymous == true) { %>
+            <small class="text-muted">Posted by Anonymous</small>
+            <% } else { %>
+                <small class="text-muted">Posted by</small>
+                <a href="/<%= timeline[i].author %>">
+                    <%= timeline[i].author %>
+                </a> <% } %>
+            <small class="text-muted">on <%= timeline[i].created %></small>
+        </div>
+    </div>
+<% } %>
+
+<%- include('partials/footer.ejs') %>
+
